@@ -1,0 +1,26 @@
+[
+  {
+    "id": "b969af32ecb3",
+    "name": "Ozi Group",
+    "enabled": true,
+    "created_at": 1793102323
+  },
+  {
+    "id": "eff0b231826f",
+    "name": "Kraken Studios",
+    "enabled": true,
+    "created_at": 1793179921
+  },
+  {
+    "id": "3a2b0513ea4d",
+    "name": "Oasis Studio",
+    "enabled": true,
+    "created_at": 1793180116
+  },
+  {
+    "id": "a0635c0c8efa",
+    "name": "gamemax",
+    "enabled": true,
+    "created_at": 1795084594
+  }
+]

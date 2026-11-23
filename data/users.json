@@ -1,0 +1,35 @@
+{
+  "oasis": {
+    "role": "accountant",
+    "company": "Oasis Studio",
+    "salt": "75a46b11cc547afb66d3029ef844b0b9",
+    "password_hash": "6aa1c48fc12b7512d4aaf4b1f06c84401b4cd00e7d1edd38e22084bfbd7d1b9f",
+    "active": true
+  },
+  "kraken": {
+    "role": "accountant",
+    "company": "Kraken Studios",
+    "salt": "2504b75a44c6c54831e8b5e8c0df0212",
+    "password_hash": "b04f9f32772272b376177c809fb52e8512e61e063a92d902d4b6be3f45879fb8",
+    "active": true,
+    "permissions": {
+      "view": true,
+      "upload": false,
+      "download": true,
+      "edit": false
+    }
+  },
+  "gamemax": {
+    "role": "accountant",
+    "company": "gamemax",
+    "salt": "410509aa6585a3bfe7d4e20caf0d52ac",
+    "password_hash": "13f1696ae73f105ac263c396ae6f3b745688ab772f61649b42bd65882b4643a9",
+    "active": true,
+    "permissions": {
+      "view": true,
+      "upload": true,
+      "download": true,
+      "edit": true
+    }
+  }
+}

@@ -1,0 +1,628 @@
+<?xml version="1.0" ?>
+<QBXML>
+<QBXMLMsgsRs>
+<GeneralSummaryReportQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+<ReportRet>
+<ReportTitle>Profit &amp; Loss</ReportTitle>
+<ReportSubtitle>October 2026</ReportSubtitle>
+<ReportBasis>Accrual</ReportBasis>
+<NumRows>140</NumRows>
+<NumColumns>2</NumColumns>
+<NumColTitleRows>1</NumColTitleRows>
+<ColDesc colID="1" dataType="STRTYPE">
+<ColTitle titleRow="1" />
+<ColType>Label</ColType>
+</ColDesc>
+<ColDesc colID="2" dataType="AMTTYPE">
+<ColTitle titleRow="1" value="Oct 26" />
+<ColType>Amount</ColType>
+</ColDesc>
+<ReportData>
+<TextRow rowNumber="1" value="Ordinary Income/Expense" />
+<TextRow rowNumber="2" value="Income" />
+<TextRow rowNumber="3" value="REVENUE" />
+<DataRow rowNumber="4">
+<RowData rowType="account" value="REVENUE:Vungle" />
+<ColData colID="1" value="Vungle" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="5">
+<RowData rowType="account" value="REVENUE:Mintegral" />
+<ColData colID="1" value="Mintegral" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="6">
+<RowData rowType="account" value="REVENUE:Pangle" />
+<ColData colID="1" value="Pangle" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="7">
+<RowData rowType="account" value="REVENUE:Netlink" />
+<ColData colID="1" value="Netlink" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="8">
+<RowData rowType="account" value="REVENUE:Amazon" />
+<ColData colID="1" value="Amazon" />
+<ColData colID="2" value="54211.46" />
+</DataRow>
+<DataRow rowNumber="9">
+<RowData rowType="account" value="REVENUE:Apple-InApps" />
+<ColData colID="1" value="Apple-InApps" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="10">
+<RowData rowType="account" value="REVENUE:Applovin" />
+<ColData colID="1" value="Applovin" />
+<ColData colID="2" value="189248.97" />
+</DataRow>
+<DataRow rowNumber="11">
+<RowData rowType="account" value="REVENUE:Chartboost" />
+<ColData colID="1" value="Chartboost" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="12">
+<RowData rowType="account" value="REVENUE:Consulting Income" />
+<ColData colID="1" value="Consulting Income" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="13">
+<RowData rowType="account" value="REVENUE:Facebook" />
+<ColData colID="1" value="Facebook" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="14">
+<RowData rowType="account" value="REVENUE:Google - Admob" />
+<ColData colID="1" value="Google - Admob" />
+<ColData colID="2" value="332177.24" />
+</DataRow>
+<DataRow rowNumber="15">
+<RowData rowType="account" value="REVENUE:Google - InApps" />
+<ColData colID="1" value="Google - InApps" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="16">
+<RowData rowType="account" value="REVENUE:IT Export Services" />
+<ColData colID="1" value="IT Export Services" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="17">
+<RowData rowType="account" value="REVENUE:Sales - Software" />
+<ColData colID="1" value="Sales - Software" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="18">
+<RowData rowType="account" value="REVENUE:Unity Technologies" />
+<ColData colID="1" value="Unity Technologies" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="19">
+<RowData rowType="account" value="REVENUE:Weewo Services" />
+<ColData colID="1" value="Weewo Services" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="20">
+<RowData rowType="account" value="REVENUE" />
+<ColData colID="1" value="REVENUE - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="21">
+<RowData rowType="account" value="REVENUE" />
+<ColData colID="1" value="Total REVENUE" />
+<ColData colID="2" value="575637.67" />
+</SubtotalRow>
+<SubtotalRow rowNumber="22">
+<ColData colID="1" value="Total Income" />
+<ColData colID="2" value="575637.67" />
+</SubtotalRow>
+<TextRow rowNumber="23" value="Cost of Goods Sold" />
+<TextRow rowNumber="24" value="Cost of Goods Sold" />
+<DataRow rowNumber="25">
+<RowData rowType="account" value="Cost of Goods Sold:Disc(Payment Processing Fee)" />
+<ColData colID="1" value="Disc(Payment Processing Fee)" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="26">
+<RowData rowType="account" value="Cost of Goods Sold" />
+<ColData colID="1" value="Cost of Goods Sold - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="27">
+<RowData rowType="account" value="Cost of Goods Sold" />
+<ColData colID="1" value="Total Cost of Goods Sold" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<TextRow rowNumber="28" value="MARKETING EXPENSES" />
+<DataRow rowNumber="29">
+<RowData rowType="account" value="MARKETING EXPENSES:Mintegral Marketing Campaigns" />
+<ColData colID="1" value="Mintegral Marketing Campaigns" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="30">
+<RowData rowType="account" value="MARKETING EXPENSES:Google Marketing Campaigns" />
+<ColData colID="1" value="Google Marketing Campaigns" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="31">
+<RowData rowType="account" value="MARKETING EXPENSES" />
+<ColData colID="1" value="MARKETING EXPENSES - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="32">
+<RowData rowType="account" value="MARKETING EXPENSES" />
+<ColData colID="1" value="Total MARKETING EXPENSES" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<SubtotalRow rowNumber="33">
+<ColData colID="1" value="Total COGS" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<SubtotalRow rowNumber="34">
+<ColData colID="1" value="Gross Profit" />
+<ColData colID="2" value="575637.67" />
+</SubtotalRow>
+<TextRow rowNumber="35" value="Expense" />
+<TextRow rowNumber="36" value="BRANDING / ADVERTISING / PROMO" />
+<DataRow rowNumber="37">
+<RowData rowType="account" value="BRANDING / ADVERTISING / PROMO:Advertising and Promotion" />
+<ColData colID="1" value="Advertising and Promotion" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="38">
+<RowData rowType="account" value="BRANDING / ADVERTISING / PROMO:Events" />
+<ColData colID="1" value="Events" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="39">
+<RowData rowType="account" value="BRANDING / ADVERTISING / PROMO:Foreign Trip Expense" />
+<ColData colID="1" value="Foreign Trip Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="40">
+<RowData rowType="account" value="BRANDING / ADVERTISING / PROMO:HR Monthly Activities" />
+<ColData colID="1" value="HR Monthly Activities" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="41">
+<RowData rowType="account" value="BRANDING / ADVERTISING / PROMO" />
+<ColData colID="1" value="BRANDING / ADVERTISING / PROMO - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="42">
+<RowData rowType="account" value="BRANDING / ADVERTISING / PROMO" />
+<ColData colID="1" value="Total BRANDING / ADVERTISING / PROMO" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<TextRow rowNumber="43" value="FINANCE COST" />
+<DataRow rowNumber="44">
+<RowData rowType="account" value="FINANCE COST:Bank Service Charges" />
+<ColData colID="1" value="Bank Service Charges" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="45">
+<RowData rowType="account" value="FINANCE COST:Interest Expense" />
+<ColData colID="1" value="Interest Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="46">
+<RowData rowType="account" value="FINANCE COST" />
+<ColData colID="1" value="FINANCE COST - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="47">
+<RowData rowType="account" value="FINANCE COST" />
+<ColData colID="1" value="Total FINANCE COST" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<TextRow rowNumber="48" value="OPERATING EXPENSES" />
+<DataRow rowNumber="49">
+<RowData rowType="account" value="OPERATING EXPENSES:Audit Fee" />
+<ColData colID="1" value="Audit Fee" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="50">
+<RowData rowType="account" value="OPERATING EXPENSES:Social Security Expense" />
+<ColData colID="1" value="Social Security Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="51">
+<RowData rowType="account" value="OPERATING EXPENSES:VM Charges (Virtual Machines)" />
+<ColData colID="1" value="VM Charges (Virtual Machines)" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="52">
+<RowData rowType="account" value="OPERATING EXPENSES:Cleaning Expense" />
+<ColData colID="1" value="Cleaning Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="53">
+<RowData rowType="account" value="OPERATING EXPENSES:Commission Expense" />
+<ColData colID="1" value="Commission Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="54">
+<RowData rowType="account" value="OPERATING EXPENSES:Communication Expense" />
+<ColData colID="1" value="Communication Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="55">
+<RowData rowType="account" value="OPERATING EXPENSES:Digital Assets Purchase" />
+<ColData colID="1" value="Digital Assets Purchase" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="56">
+<RowData rowType="account" value="OPERATING EXPENSES:Fees and Subscriptions" />
+<ColData colID="1" value="Fees and Subscriptions" />
+<ColData colID="2" value="6703.00" />
+</DataRow>
+<DataRow rowNumber="57">
+<RowData rowType="account" value="OPERATING EXPENSES:Generator Expense" />
+<ColData colID="1" value="Generator Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="58">
+<RowData rowType="account" value="OPERATING EXPENSES:Consultancy Services" />
+<ColData colID="1" value="Consultancy Services" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="59">
+<RowData rowType="account" value="OPERATING EXPENSES:IT Accessories" />
+<ColData colID="1" value="IT Accessories" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="60">
+<RowData rowType="account" value="OPERATING EXPENSES:Legal &amp; Professional Charges" />
+<ColData colID="1" value="Legal &amp; Professional Charges" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="61">
+<RowData rowType="account" value="OPERATING EXPENSES:Meals and Entertainment" />
+<ColData colID="1" value="Meals and Entertainment" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="62">
+<RowData rowType="account" value="OPERATING EXPENSES:Mineral Water Expense" />
+<ColData colID="1" value="Mineral Water Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="63">
+<RowData rowType="account" value="OPERATING EXPENSES:Miscellaneous Expense" />
+<ColData colID="1" value="Miscellaneous Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="64">
+<RowData rowType="account" value="OPERATING EXPENSES:Office Supplies" />
+<ColData colID="1" value="Office Supplies" />
+<ColData colID="2" value="41250.00" />
+</DataRow>
+<DataRow rowNumber="65">
+<RowData rowType="account" value="OPERATING EXPENSES:Postage &amp; delivery" />
+<ColData colID="1" value="Postage &amp; delivery" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="66">
+<RowData rowType="account" value="OPERATING EXPENSES:Prime HR Fee" />
+<ColData colID="1" value="Prime HR Fee" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="67">
+<RowData rowType="account" value="OPERATING EXPENSES:Printing and Stationery" />
+<ColData colID="1" value="Printing and Stationery" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="68">
+<RowData rowType="account" value="OPERATING EXPENSES:Professional Fees" />
+<ColData colID="1" value="Professional Fees" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<TextRow rowNumber="69" value="Repair and Maintenance" />
+<DataRow rowNumber="70">
+<RowData rowType="account" value="OPERATING EXPENSES:Repair and Maintenance:Automobile Expense" />
+<ColData colID="1" value="Automobile Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="71">
+<RowData rowType="account" value="OPERATING EXPENSES:Repair and Maintenance:Repair &amp; Maintenance- I.T Equip" />
+<ColData colID="1" value="Repair &amp; Maintenance- I.T Equip" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="72">
+<RowData rowType="account" value="OPERATING EXPENSES:Repair and Maintenance:Repair &amp; Maintenance - Office" />
+<ColData colID="1" value="Repair &amp; Maintenance - Office" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="73">
+<RowData rowType="account" value="OPERATING EXPENSES:Repair and Maintenance" />
+<ColData colID="1" value="Repair and Maintenance - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="74">
+<RowData rowType="account" value="OPERATING EXPENSES:Repair and Maintenance" />
+<ColData colID="1" value="Total Repair and Maintenance" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<DataRow rowNumber="75">
+<RowData rowType="account" value="OPERATING EXPENSES:Travel Expense" />
+<ColData colID="1" value="Travel Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="76">
+<RowData rowType="account" value="OPERATING EXPENSES:Virtual Machine (VM)" />
+<ColData colID="1" value="Virtual Machine (VM)" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="77">
+<RowData rowType="account" value="OPERATING EXPENSES" />
+<ColData colID="1" value="OPERATING EXPENSES - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="78">
+<RowData rowType="account" value="OPERATING EXPENSES" />
+<ColData colID="1" value="Total OPERATING EXPENSES" />
+<ColData colID="2" value="47953.00" />
+</SubtotalRow>
+<TextRow rowNumber="79" value="RENT &amp; PITB UTILITIES" />
+<DataRow rowNumber="80">
+<RowData rowType="account" value="RENT &amp; PITB UTILITIES:Rent Central Plaza Office" />
+<ColData colID="1" value="Rent Central Plaza Office" />
+<ColData colID="2" value="42062.50" />
+</DataRow>
+<DataRow rowNumber="81">
+<RowData rowType="account" value="RENT &amp; PITB UTILITIES:Building Maintenance" />
+<ColData colID="1" value="Building Maintenance" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="82">
+<RowData rowType="account" value="RENT &amp; PITB UTILITIES:Rent Expense Level # 15" />
+<ColData colID="1" value="Rent Expense Level # 15" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="83">
+<RowData rowType="account" value="RENT &amp; PITB UTILITIES:Rent Expense ISB office" />
+<ColData colID="1" value="Rent Expense ISB office" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="84">
+<RowData rowType="account" value="RENT &amp; PITB UTILITIES:Utilities PITB" />
+<ColData colID="1" value="Utilities PITB" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="85">
+<RowData rowType="account" value="RENT &amp; PITB UTILITIES" />
+<ColData colID="1" value="RENT &amp; PITB UTILITIES - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="86">
+<RowData rowType="account" value="RENT &amp; PITB UTILITIES" />
+<ColData colID="1" value="Total RENT &amp; PITB UTILITIES" />
+<ColData colID="2" value="42062.50" />
+</SubtotalRow>
+<TextRow rowNumber="87" value="STAFF SALARIES &amp; OTHER BENEFITS" />
+<DataRow rowNumber="88">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employee Rewards / Commission" />
+<ColData colID="1" value="Employee Rewards / Commission" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<TextRow rowNumber="89" value="Employees Benefits" />
+<DataRow rowNumber="90">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employees Benefits:Car (Contribution)" />
+<ColData colID="1" value="Car (Contribution)" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="91">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employees Benefits:Continuing Education" />
+<ColData colID="1" value="Continuing Education" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="92">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employees Benefits:Employer PF Contribution" />
+<ColData colID="1" value="Employer PF Contribution" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="93">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employees Benefits:EOBI Expense" />
+<ColData colID="1" value="EOBI Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="94">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employees Benefits:Leave Encashment" />
+<ColData colID="1" value="Leave Encashment" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="95">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employees Benefits:Medical Expense" />
+<ColData colID="1" value="Medical Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="96">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employees Benefits:Stipend / Remote Work" />
+<ColData colID="1" value="Stipend / Remote Work" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="97">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employees Benefits" />
+<ColData colID="1" value="Employees Benefits - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="98">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Employees Benefits" />
+<ColData colID="1" value="Total Employees Benefits" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<TextRow rowNumber="99" value="Payroll Expenses" />
+<DataRow rowNumber="100">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Payroll Expenses:Designing Dept Salaries" />
+<ColData colID="1" value="Designing Dept Salaries" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="101">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Payroll Expenses:Engineering Dept Salaries" />
+<ColData colID="1" value="Engineering Dept Salaries" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="102">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Payroll Expenses:Management Dept Salaries" />
+<ColData colID="1" value="Management Dept Salaries" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="103">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Payroll Expenses:Marketing Dept Salaries" />
+<ColData colID="1" value="Marketing Dept Salaries" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="104">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Payroll Expenses:Operations Dept Salaries" />
+<ColData colID="1" value="Operations Dept Salaries" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="105">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Payroll Expenses" />
+<ColData colID="1" value="Payroll Expenses - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="106">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS:Payroll Expenses" />
+<ColData colID="1" value="Total Payroll Expenses" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<DataRow rowNumber="107">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS" />
+<ColData colID="1" value="STAFF SALARIES &amp; OTHER BENEFITS - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="108">
+<RowData rowType="account" value="STAFF SALARIES &amp; OTHER BENEFITS" />
+<ColData colID="1" value="Total STAFF SALARIES &amp; OTHER BENEFITS" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<TextRow rowNumber="109" value="TAXATION" />
+<DataRow rowNumber="110">
+<RowData rowType="account" value="TAXATION:Income Tax Expense u/s 154A" />
+<ColData colID="1" value="Income Tax Expense u/s 154A" />
+<ColData colID="2" value="2408.73" />
+</DataRow>
+<DataRow rowNumber="111">
+<RowData rowType="account" value="TAXATION" />
+<ColData colID="1" value="TAXATION - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="112">
+<RowData rowType="account" value="TAXATION" />
+<ColData colID="1" value="Total TAXATION" />
+<ColData colID="2" value="2408.73" />
+</SubtotalRow>
+<TextRow rowNumber="113" value="UTILITY BILLS" />
+<DataRow rowNumber="114">
+<RowData rowType="account" value="UTILITY BILLS:Electricity Bill Central Plaza" />
+<ColData colID="1" value="Electricity Bill Central Plaza" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="115">
+<RowData rowType="account" value="UTILITY BILLS:Electricity Bill Level# 15" />
+<ColData colID="1" value="Electricity Bill Level# 15" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="116">
+<RowData rowType="account" value="UTILITY BILLS:Internet Expense" />
+<ColData colID="1" value="Internet Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="117">
+<RowData rowType="account" value="UTILITY BILLS:PTCL Bills" />
+<ColData colID="1" value="PTCL Bills" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="118">
+<RowData rowType="account" value="UTILITY BILLS:Water Bill" />
+<ColData colID="1" value="Water Bill" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="119">
+<RowData rowType="account" value="UTILITY BILLS" />
+<ColData colID="1" value="UTILITY BILLS - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="120">
+<RowData rowType="account" value="UTILITY BILLS" />
+<ColData colID="1" value="Total UTILITY BILLS" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<SubtotalRow rowNumber="121">
+<ColData colID="1" value="Total Expense" />
+<ColData colID="2" value="92424.23" />
+</SubtotalRow>
+<SubtotalRow rowNumber="122">
+<ColData colID="1" value="Net Ordinary Income" />
+<ColData colID="2" value="483213.44" />
+</SubtotalRow>
+<TextRow rowNumber="123" value="Other Income/Expense" />
+<TextRow rowNumber="124" value="Other Income" />
+<TextRow rowNumber="125" value="OTHER INCOME" />
+<DataRow rowNumber="126">
+<RowData rowType="account" value="OTHER INCOME:Interest Income" />
+<ColData colID="1" value="Interest Income" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="127">
+<RowData rowType="account" value="OTHER INCOME:Rental Income" />
+<ColData colID="1" value="Rental Income" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="128">
+<RowData rowType="account" value="OTHER INCOME" />
+<ColData colID="1" value="OTHER INCOME - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="129">
+<RowData rowType="account" value="OTHER INCOME" />
+<ColData colID="1" value="Total OTHER INCOME" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<SubtotalRow rowNumber="130">
+<ColData colID="1" value="Total Other Income" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<TextRow rowNumber="131" value="Other Expense" />
+<TextRow rowNumber="132" value="OTHER EXPENSES" />
+<DataRow rowNumber="133">
+<RowData rowType="account" value="OTHER EXPENSES:Dubai Office Expense" />
+<ColData colID="1" value="Dubai Office Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="134">
+<RowData rowType="account" value="OTHER EXPENSES:Ask My Accountant" />
+<ColData colID="1" value="Ask My Accountant" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="135">
+<RowData rowType="account" value="OTHER EXPENSES:Depreciation Expense" />
+<ColData colID="1" value="Depreciation Expense" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<DataRow rowNumber="136">
+<RowData rowType="account" value="OTHER EXPENSES" />
+<ColData colID="1" value="OTHER EXPENSES - Other" />
+<ColData colID="2" value="0.00" />
+</DataRow>
+<SubtotalRow rowNumber="137">
+<RowData rowType="account" value="OTHER EXPENSES" />
+<ColData colID="1" value="Total OTHER EXPENSES" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<SubtotalRow rowNumber="138">
+<ColData colID="1" value="Total Other Expense" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<SubtotalRow rowNumber="139">
+<ColData colID="1" value="Net Other Income" />
+<ColData colID="2" value="0.00" />
+</SubtotalRow>
+<TotalRow rowNumber="140">
+<ColData colID="1" value="Net Income" />
+<ColData colID="2" value="483213.44" />
+</TotalRow>
+</ReportData>
+</ReportRet>
+</GeneralSummaryReportQueryRs>
+</QBXMLMsgsRs>
+</QBXML>

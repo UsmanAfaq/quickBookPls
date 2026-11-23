@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rs → USD Ledger Tool</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f4f7fb; --surface:#ffffff; --surface-2:#f8fafc; --line:#e5eaf0;
+  --text:#172033; --muted:#6b7688; --primary:#2563eb; --primary-dark:#1d4ed8;
+  --success:#16a34a; --danger:#dc2626; --purple:#7c3aed;
+  --shadow:0 10px 30px rgba(15,23,42,.07); --radius:16px;
+}
+*{box-sizing:border-box}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);margin:0}
+body:before{content:"";position:fixed;inset:0 auto 0 0;width:248px;background:#111827;z-index:-1}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:248px;background:#111827;color:#fff;padding:26px 18px;z-index:20}
+.brand{display:flex;align-items:center;gap:12px;padding:4px 10px 30px}
+.brand-mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:grid;place-items:center;font-weight:800;font-size:17px}
+.brand strong{font-size:15px;display:block}.brand small{color:#9ca3af;font-size:11px}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#6b7280;padding:0 12px;margin:10px 0 8px}
+.nav-item{display:flex;align-items:center;gap:11px;color:#cbd5e1;text-decoration:none;padding:11px 12px;border-radius:10px;font-size:13px;margin:3px 0}
+.nav-item:hover,.nav-item.active{background:#1f2937;color:#fff}.nav-icon{width:22px;text-align:center;font-size:15px}
+.sidebar-footer{position:absolute;left:18px;right:18px;bottom:20px;padding:12px;border:1px solid #263244;border-radius:12px;color:#9ca3af;font-size:11px}
+.wrap{margin-left:248px;max-width:none;padding:30px 38px 50px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--primary);font-weight:700}
+h1{font-size:28px;line-height:1.2;margin:4px 0 5px;letter-spacing:-.03em}.lede{margin:0;color:var(--muted);font-size:13px}
+.rate-pill{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);padding:9px 13px;border-radius:999px;box-shadow:0 4px 14px rgba(15,23,42,.04);font-size:12px;color:var(--muted)}
+.rate-dot{width:8px;height:8px;border-radius:50%;background:var(--success)}
+.dashboard-grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;align-items:start}
+.panel,.panel2,.graph-builder{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.panel{padding:22px}.panel2{padding:24px;margin-top:22px;display:none}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.section-head h2{margin:0;font-size:17px}.section-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.upload-card{border:1.5px dashed #b8c4d5;border-radius:14px;padding:30px 18px;text-align:center;cursor:pointer;background:linear-gradient(180deg,#fbfdff,#f7faff);transition:.2s}
+.upload-card:hover,.upload-card.drag{border-color:var(--primary);background:#eff6ff}
+.upload-icon{width:48px;height:48px;border-radius:14px;background:#dbeafe;color:var(--primary);display:grid;place-items:center;margin:0 auto 12px;font-size:21px}
+.upload-card strong{display:block;font-size:14px}.upload-card span{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+input[type=file]{display:none}
+
+.rate-settings{margin-top:17px;padding:16px;border:1px solid #dce4ef;border-radius:14px;background:linear-gradient(145deg,#f8fbff,#f3f7fc)}
+.rate-settings-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rate-settings-title{font-size:13px;font-weight:800;color:#172033}.rate-settings-sub{font-size:10px;line-height:1.5;color:#718096;margin-top:4px;max-width:520px}
+.rate-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:5px 8px;border-radius:999px;background:#eef2f7;color:#64748b;white-space:nowrap}.rate-badge.saved{background:#dcfce7;color:#15803d}
+.rate-entry{display:flex;align-items:center;gap:9px;margin-top:13px}.rate-symbol{width:38px;height:38px;border-radius:10px;background:#172033;color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px;flex:0 0 auto}
+.rate-input-wrap{display:flex;align-items:center;gap:7px;flex:1;background:#fff;border:1px solid #d8e0eb;border-radius:10px;padding:0 10px;height:40px;color:#64748b;font-size:12px}.rate-input-wrap input{border:0!important;box-shadow:none!important;padding:8px 0!important;min-width:0;font-weight:800;color:#172033}.rate-input-wrap b{font-size:11px;color:#475569}.save-rate-btn{height:40px;background:#2563eb;padding:0 14px;white-space:nowrap}.rate-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;font-size:10px;color:#7b8798}.clear-rate-btn{background:transparent!important;color:#64748b!important;box-shadow:none!important;padding:3px 0!important;font-size:10px}
+.field{margin-top:16px}.field label,.graph-controls label{display:block;font-size:11px;font-weight:700;color:#566176;margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em}
+.field input,.graph-controls input,.field select,select{width:100%;padding:11px 12px;font-size:13px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box;background:#fff;color:var(--text);outline:none}
+.field input:focus,.graph-controls input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
+.status-box{margin-top:12px;font-size:12px;padding:10px 12px;border-radius:9px;background:#f8fafc;color:var(--muted)}
+#status.error{color:var(--danger);background:#fef2f2}#status.ok{color:var(--success);background:#f0fdf4}
+.file-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:10px;margin-top:8px}
+.file-row input[type=checkbox]{width:16px;height:16px}.file-name{font-size:12px;flex:1;word-break:break-word}
+button{font-family:inherit;border:0;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:700;color:#fff;background:var(--primary);cursor:pointer;transition:.18s;box-shadow:0 4px 12px rgba(15,23,42,.08)}
+button:hover{transform:translateY(-1px);filter:brightness(.98)}
+.file-row button{width:auto;margin:0;padding:7px 10px;font-size:11px}.file-usd-btn{background:#2563eb!important}.file-remove-btn{background:#ef4444!important}
+#fileList{margin-top:15px}.empty-hint{font-size:12px;color:var(--muted);margin-top:12px}
+.kpi-column{display:grid;gap:12px}.mini-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 5px 18px rgba(15,23,42,.04)}
+.mini-card .mini-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.mini-card .mini-value{font-size:22px;font-weight:800;margin-top:7px}.mini-card .mini-note{font-size:11px;color:var(--muted);margin-top:4px}
+.action-card{background:#172033;color:#fff;border-radius:14px;padding:17px}.action-card h3{margin:0 0 5px;font-size:14px}.action-card p{margin:0;color:#aeb9c9;font-size:11px;line-height:1.5}
+.selection-title{margin:0 0 8px;font-size:16px}.selection-block{margin-top:20px;padding-top:8px;border-top:1px solid var(--line)}
+#selectionTree{max-height:none;overflow-y:visible;border:1px solid var(--line);border-radius:12px;background:#fbfcfe;padding:9px 12px}
+.tree-item{display:flex;align-items:center;gap:9px;padding:6px 4px;font-size:12px;cursor:pointer;line-height:1.3}.tree-item input{margin:0;width:15px;height:15px}.tree-group-total{font-weight:700}.tree-members{margin-left:20px;border-left:2px solid #e7edf4;padding-left:10px}.tree-divider{border:none;border-top:1px solid var(--line);margin:8px 0}
+.selCount{font-size:11px;color:var(--muted);margin-top:7px}.sel-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.sel-chip{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:10px;padding:5px 9px;border-radius:999px}
+#downloadSelectionBtn,#downloadSelectionPdfBtn,#downloadPdfBtn,#downloadFullPdfBtn{width:auto;margin:16px 8px 0 0}#downloadSelectionBtn{background:#2563eb}#downloadSelectionPdfBtn,#downloadPdfBtn{background:#7c3aed}#downloadFullPdfBtn{background:#0f766e}
+.compare-box{margin-top:18px;padding:14px;background:#f8fafc;border:1px solid var(--line);border-radius:12px}.compare-box h3{margin:0 0 6px;font-size:14px}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:11px}.table-scroll{overflow-x:auto;width:100%}.table-scroll table{min-width:760px}td,th{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left}td.num,th.num{text-align:right}.total-col{background:#f8fafc;font-weight:700}
+.cat-heading{margin-top:20px;padding:9px 11px;background:#f8fafc;border-left:3px solid var(--primary);font-size:10px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.08em}
+tr.total-row td{font-weight:700;border-top:2px solid #cbd5e1}.net-row td{font-weight:800;font-size:13px;color:var(--success)}.net-loss-row td{font-weight:800;font-size:13px;color:var(--danger)}
+.pnl-subsection{display:block;font-size:9px;color:var(--muted);margin-bottom:2px;text-transform:uppercase;letter-spacing:.03em}.pnl-result-row td{font-weight:700}
+tr.h-row td{font-weight:800;background:#f8fafc;color:#475569;text-transform:uppercase;font-size:10px;letter-spacing:.04em}tr.h-total td{font-weight:800;border-top:1px solid #cbd5e1}tr.h-total.lvl0 td{background:#eef4ff;border-top:2px solid #93c5fd}
+.hint,.chart-note{font-size:11px;color:var(--muted);margin-top:5px}.usd-sub{font-size:10px;color:var(--success)}
+.select-all{border-bottom:1px dashed var(--line);margin-bottom:6px;padding-bottom:8px;font-size:12px}
+.pnl-legend{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 10px}.pnl-chip{width:auto;margin:0;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;font-size:11px;font-weight:600;border:1px solid var(--line);border-radius:999px;background:#fff;color:#111;box-shadow:none;cursor:pointer}.pnl-chip i{width:10px;height:10px;border-radius:3px;display:inline-block}.pnl-chip.off{opacity:.4;text-decoration:line-through}
+.charts-title{margin-top:26px;font-size:15px;border-top:1px solid var(--line);padding-top:20px}.chart-card{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto}.chart-card h4{margin:0 0 8px;font-size:13px}.chart-svg{width:100%;min-width:680px;height:280px;display:block}
+.breakdown-card{margin:12px 0;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 4px 14px rgba(15,23,42,.04)}
+.breakdown-card summary{list-style:none}.breakdown-card summary::-webkit-details-marker{display:none}.breakdown-summary{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 18px;cursor:pointer;background:linear-gradient(180deg,#fff,#fbfcfe)}.breakdown-summary:hover{background:#f8fafc}.breakdown-title{display:flex;align-items:center;gap:12px;min-width:0}.breakdown-title b{display:block;font-size:13px;color:#172033}.breakdown-title small{display:block;margin-top:3px;color:var(--muted);font-size:10px;font-weight:500}.breakdown-chevron{width:28px;height:28px;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;font-size:16px;color:var(--primary);transition:transform .2s,background .2s}.breakdown-card[open] .breakdown-chevron{transform:rotate(180deg);background:#eef5fa}.breakdown-total{display:flex;align-items:center;gap:16px;white-space:nowrap;font-size:13px;font-weight:800;color:#182230}.breakdown-total b{color:var(--primary)}.breakdown-detail{border-top:1px solid var(--line);padding:4px 14px 14px}.breakdown-detail .table-scroll{margin-top:8px}
+.graph-builder{margin-left:248px;border-radius:var(--radius);padding:28px 38px 38px;box-shadow:var(--shadow);border-top:3px solid var(--primary)}
+.graph-builder h2{margin:0;font-size:20px;letter-spacing:-.02em}.graph-builder>.hint{margin:5px 0 20px}
+.graph-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.graph-box{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:15px}.graph-box h3{margin:0 0 10px;font-size:12px}
+.graph-list{max-height:none;overflow-y:visible;border:1px solid var(--line);padding:8px 10px;border-radius:9px;background:#fff}.graph-check{display:flex;gap:8px;align-items:center;padding:6px 0;font-size:11px}.graph-check input{width:15px;height:15px;margin:0}
+.graph-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}.graph-controls label{display:block}
+#buildGraphBtn{background:var(--primary);margin-top:16px;width:auto}.graph-status{font-size:11px;margin-top:8px;color:var(--muted)}
+#graphResult{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;overflow-x:auto}.graph-data-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:11px}.graph-data-table th,.graph-data-table td{border:1px solid var(--line);padding:8px;text-align:left}.graph-data-table th{background:#f8fafc}.graph-result-title{font-size:14px;font-weight:800;margin-bottom:8px}.graph-svg{width:100%;min-width:720px;height:auto;display:block}
+#downloadGraphSvgBtn{background:#334155!important}#downloadGraphPngBtn{background:#7c3aed!important}#downloadGraphCsvBtn{background:#16a34a!important}#loadAdOptionsBtn{background:#475569!important}
+body.guest .admin-only,body.accountant .admin-only{display:none!important}
+body.guest .upload-only{display:none!important}
+body.admin .guest-only,body.accountant .guest-only{display:none!important}
+.logout-link{color:#2563eb;font-weight:800;text-decoration:none;margin-left:6px;padding-left:10px;border-left:1px solid var(--line)}
+.role-chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;background:#dbeafe;color:#1d4ed8}body.guest .role-chip{background:#ccfbf1;color:#0f766e}
+.guest-note{margin-top:4px;padding:12px 14px;border-radius:12px;background:#f0fdfa;border:1px solid #99f6e4;color:#115e59;font-size:12px;line-height:1.5}
+.rate-cell{display:flex;align-items:center;gap:6px;font-size:11px;color:#64748b;white-space:nowrap}
+.rate-cell input{width:96px;padding:7px 8px;font-size:12px;font-weight:700;border-radius:8px}.rate-cell.missing input{border-color:#f59e0b;background:#fffbeb}
+.rate-cell button{padding:7px 10px;font-size:11px;background:#16a34a}.rate-ro{font-weight:800;color:#172033}.rate-ro.missing{color:#d97706}
+#compareBtn{background:#b45309;width:auto;margin:16px 8px 0 0}
+.compare-panel{margin-top:20px;padding:18px;border:1px solid #fcd9a8;border-radius:14px;background:#fffaf2;display:none}
+.compare-panel h3{margin:0 0 4px;font-size:16px}
+#runCompareBtn{background:#b45309;width:auto;margin-top:14px;margin-right:8px}#downloadCompareBtn{background:#2563eb;width:auto;margin-top:14px}
+.cmp-card{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.cmp-card h4{margin:2px 0 6px;font-size:14px}.cmp-card h5{margin:14px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#475569}
+.cmp-table{min-width:0!important;font-size:11px}.cmp-table th{background:#f8fafc;white-space:nowrap}.cmp-table td.num,.cmp-table th.num{white-space:nowrap}
+.cmp-table .grp-month{background:#eef4ff}.cmp-table .grp-diff{background:#f4f1ff}.cmp-table .grp-overall{background:#fff4d6}
+.neg{color:#dc2626}.pos{color:#15803d}
+.co-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 16px}
+.co-bar label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#475569}
+.co-bar select{width:auto;min-width:220px;max-width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-weight:700}
+.co-bar button{width:auto;margin:0;padding:8px 12px;font-size:12px}
+.co-state{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}
+.co-on{background:#dcfce7;color:#15803d}.co-off{background:#fee2e2;color:#b91c1c}
+.co-empty{background:#fff7ed;border:1px dashed #fb923c;border-radius:12px;padding:16px;margin-bottom:16px;font-size:14px}
+@media(max-width:1050px){.sidebar{width:210px}.wrap,.graph-builder{margin-left:210px}.dashboard-grid{grid-template-columns:1fr}.kpi-column{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){body:before{display:none}.sidebar{position:relative;width:100%;height:auto;padding:12px}.brand{padding:4px 8px 12px}.nav-label,.nav-item,.sidebar-footer{display:none}.wrap,.graph-builder{margin-left:0;padding:20px 14px}.topbar{align-items:flex-start;gap:12px}.rate-pill{display:none}.dashboard-grid,.graph-grid,.graph-controls{grid-template-columns:1fr}.kpi-column{grid-template-columns:1fr 1fr}.panel,.panel2,.graph-builder{padding:16px}.file-row{align-items:flex-start;flex-wrap:wrap}.file-name{min-width:180px}.graph-controls[style]{grid-template-columns:1fr!important}}
+
+/* ---- button colours (every button now has a visible background) ---- */
+.btn-primary{background:#2563eb}.btn-success{background:#16a34a}.btn-danger{background:#dc2626}.btn-warning{background:#d97706}.btn-slate{background:#475569}
+button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+/* ---- permissions ---- */
+body.no-upload .upload-only{display:none!important}
+body.no-download #downloadSelectionBtn,body.no-download #downloadSelectionPdfBtn,body.no-download #downloadPdfBtn,body.no-download #downloadFullPdfBtn,body.no-download #downloadCompareBtn,body.no-download #downloadGraphSvgBtn,body.no-download #downloadGraphPngBtn,body.no-download #downloadGraphCsvBtn,body.no-download .file-usd-btn{display:none!important}
+body.no-view .co-bar,body.no-view .dashboard-grid,body.no-view #companyPanel,body.no-view #graphBuilder{display:none!important}
+/* ---- user management ---- */
+#umCreate{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:16px 0;align-items:end}
+#umCreate input[type=text],#umCreate input[type=password],.um-modal input[type=text],.um-modal input[type=password]{width:100%;padding:11px 12px;font-size:13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);outline:none}
+#umCreate input:focus,.um-modal input:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
+.um-perms{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.um-perms>b{width:100%;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#566176}
+.um-perm{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer}
+.um-perm input{width:16px;height:16px;margin:0;accent-color:#2563eb}
+.um-perm.off{opacity:.45;cursor:not-allowed}
+.um-chip{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:800;margin:2px 4px 2px 0;background:#e2e8f0;color:#94a3b8;text-decoration:line-through}
+.um-chip.on{background:#dcfce7;color:#15803d;text-decoration:none}
+.um-status{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}
+.um-status.active{background:#dcfce7;color:#15803d}.um-status.off{background:#fee2e2;color:#b91c1c}
+#umTable th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#566176;background:var(--surface-2)}
+#umTable td{vertical-align:middle}
+#umTable td .um-actions{display:flex;gap:6px;flex-wrap:nowrap}
+#umTable .um-actions button{padding:7px 11px;font-size:11px}
+.um-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.um-overlay.open{display:flex}
+.um-modal{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(15,23,42,.35);display:grid;gap:12px;max-height:92vh;overflow-y:auto}
+.um-modal h3{margin:0;font-size:18px}.um-modal label.lbl{font-size:11px;font-weight:700;color:#566176;text-transform:uppercase;letter-spacing:.05em;margin-bottom:-6px}
+.um-modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+</style></head>
+<body>
+
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">R$</div>
+    <div><strong>Ledger Pro</strong><small>Finance dashboard</small></div>
+  </div>
+  <div class="nav-label">Workspace</div>
+  <a class="nav-item active" href="#upload"><span class="nav-icon">⌂</span>Dashboard</a>
+  <a class="nav-item" href="#companyPanel"><span class="nav-icon">▦</span>P&amp;L Analysis</a>
+  <a class="nav-item" href="#comparePanel"><span class="nav-icon">⇄</span>Comparison in Amount</a>
+  <a class="nav-item" href="#graphBuilder"><span class="nav-icon">◒</span>Graph Builder</a>
+  <a class="nav-item admin-only" href="#userManagement"><span class="nav-icon">♙</span>User Management</a>
+  <div class="nav-label">Exports</div>
+  <a class="nav-item" href="#companyPanel"><span class="nav-icon">↓</span>Reports &amp; Downloads</a>
+  <div class="sidebar-footer">Rs → USD Ledger Tool<br><span>QuickBooks P&amp;L workspace</span></div>
+</div>
+
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Financial workspace</div>
+      <h1>Rs → USD Ledger Dashboard</h1>
+      <p class="lede">Transform monthly QuickBooks P&amp;L exports into a clean, interactive financial view.</p>
+    </div>
+    <div class="rate-pill"><span class="rate-dot"></span><span>Signed in as <span class="role-chip" id="roleLabel">…</span></span><a href="/logout" class="logout-link">Logout</a></div>
+  </div>
+
+  <section id="userManagement" class="panel admin-only" style="display:none;margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><h2 style="margin:0">User Management</h2><p class="hint">Create logins, choose exactly what each user can do, reset passwords, disable or remove access.</p></div><button type="button" id="umRefresh" class="btn-slate">↻ Refresh users</button></div>
+    <form id="umCreate" autocomplete="off">
+      <input type="text" name="username" placeholder="Username" required maxlength="50" autocomplete="off">
+      <input type="password" name="password" placeholder="Password (8+ chars)" required minlength="8" autocomplete="new-password">
+      <select name="role"><option value="accountant">Accountant — one company</option><option value="guest">Guest — all enabled companies</option></select>
+      <select name="company" id="umCompany"></select>
+      <div class="um-perms" id="umCreatePerms">
+        <b>Permissions</b>
+        <label class="um-perm"><input type="checkbox" data-perm="view" checked> View Sheets <span class="hint" style="margin:0">(can view existing sheets)</span></label>
+        <label class="um-perm"><input type="checkbox" data-perm="upload" checked> Upload Sheets <span class="hint" style="margin:0">(can upload new Excel sheets)</span></label>
+        <label class="um-perm"><input type="checkbox" data-perm="download" checked> Download Reports</label>
+        <label class="um-perm"><input type="checkbox" data-perm="edit"> Edit / Delete Sheets</label>
+      </div>
+      <button type="submit" class="btn-success">+ Create login</button>
+    </form>
+    <div id="umStatus" class="hint" role="status"></div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse" id="umTable"><thead><tr><th style="text-align:left;padding:9px">Username</th><th style="text-align:left;padding:9px">Access</th><th style="text-align:left;padding:9px">Company</th><th style="text-align:left;padding:9px">Permissions</th><th style="text-align:left;padding:9px">Status</th><th style="text-align:left;padding:9px">Actions</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <div class="um-overlay" id="umOverlay">
+    <div class="um-modal" role="dialog" aria-modal="true" aria-labelledby="umEditTitle">
+      <h3 id="umEditTitle">Edit user</h3>
+      <label class="lbl">Access type</label>
+      <select id="umEditRole"><option value="accountant">Accountant — one company</option><option value="guest">Guest — all enabled companies</option></select>
+      <label class="lbl">Company</label>
+      <select id="umEditCompany"></select>
+      <label class="lbl">New password (leave blank to keep current)</label>
+      <input type="password" id="umEditPassword" placeholder="New password (8+ chars)" autocomplete="new-password">
+      <div class="um-perms" id="umEditPerms" style="grid-column:auto">
+        <b>Permissions</b>
+        <label class="um-perm"><input type="checkbox" data-perm="view"> View Sheets</label>
+        <label class="um-perm"><input type="checkbox" data-perm="upload"> Upload Sheets</label>
+        <label class="um-perm"><input type="checkbox" data-perm="download"> Download Reports</label>
+        <label class="um-perm"><input type="checkbox" data-perm="edit"> Edit / Delete Sheets</label>
+      </div>
+      <label class="um-perm"><input type="checkbox" id="umEditActive"> Account active (untick to disable login)</label>
+      <div class="um-modal-actions"><button type="button" id="umEditCancel" class="btn-slate">Cancel</button><button type="button" id="umEditSave" class="btn-success">Save changes</button></div>
+    </div>
+  </div>
+
+  <div class="co-empty" id="noViewNote" style="display:none">You do not have permission to view sheets. Please ask the administrator to enable “View Sheets” for your login.</div>
+
+  <div class="co-bar" id="coBar">
+    <label for="companySelect">Company</label>
+    <select id="companySelect"></select>
+    <span id="coState" class="co-state"></span>
+    <span id="coCount" class="hint"></span>
+    <button type="button" id="coNewBtn" class="admin-only" style="background:#15803d">+ New company</button>
+    <button type="button" id="coToggleBtn" class="admin-only" style="background:#b45309"></button>
+    <button type="button" id="coRenameBtn" class="admin-only" style="background:#496b8a">Rename</button>
+    <button type="button" id="coDeleteBtn" class="admin-only" style="background:#b91c1c">Delete</button>
+  </div>
+  <div class="co-empty" id="coEmpty" style="display:none"></div>
+
+  <div class="dashboard-grid" id="upload">
+    <div class="panel">
+      <div class="section-head">
+        <div><h2>Monthly data</h2><p><span class="upload-only">Upload QuickBooks Excel P&amp;L files — each sheet gets its own USD rate.</span><span class="guest-only">Sheets and USD rates saved by the administrator (view only).</span></p></div>
+      </div>
+      <div id="dropzone" class="upload-card upload-only">
+        <div class="upload-icon">↑</div>
+        <div id="dzText"><strong>Drop .xlsx files here or click to browse</strong><span>Multiple months are supported</span></div>
+        <input type="file" id="fileInput" accept=".xlsx" multiple>
+      </div>
+      <div class="guest-note guest-only">You are logged in as a guest. You can view every saved sheet, its USD rate, the P&amp;L, graphs and comparisons. Uploading, removing sheets and changing USD rates is only available to the administrator.</div>
+      <div class="rate-settings upload-only">
+        <div class="rate-settings-head">
+          <div>
+            <div class="rate-settings-title">Default USD rate for new uploads (optional)</div>
+            <div class="rate-settings-sub">Every sheet has its OWN USD rate — set or change it on that sheet's row below. This value is only pre-filled when you upload a new sheet.</div>
+          </div>
+          <div class="rate-badge" id="savedRateBadge">Not saved</div>
+        </div>
+        <div class="rate-entry">
+          <div class="rate-symbol">$1</div>
+          <div class="rate-input-wrap">
+            <span>1 USD =</span>
+            <input type="number" id="rate" placeholder="e.g. 280.50" step="0.01" min="1" inputmode="decimal">
+            <b>PKR</b>
+          </div>
+          <button type="button" id="saveRateBtn" class="save-rate-btn">Save Rate</button>
+        </div>
+        <div class="rate-actions">
+          <span id="rateSaveMessage">Default is stored in this browser for your next session.</span>
+          <button type="button" id="clearRateBtn" class="clear-rate-btn">Clear saved rate</button>
+        </div>
+      </div>
+      <div class="panel" id="quickbooksPanel" style="margin:18px 0;border:1px solid #b7c8dc;background:#f8fbff;padding:16px;border-radius:12px">
+        <div class="section-head"><div><h2>QuickBooks Desktop 2024</h2><p>Import a monthly Profit &amp; Loss report directly from your Windows QuickBooks through Web Connector.</p></div></div>
+        <div class="rate-entry" style="flex-wrap:wrap;gap:10px">
+          <label>From <input type="date" id="qbFromDate"></label>
+          <label>To <input type="date" id="qbToDate"></label>
+          <button type="button" id="qbQueueBtn" class="save-rate-btn">Queue P&amp;L Sync</button>
+          <a href="/quickbooks/pls.qwc" class="save-rate-btn" style="text-decoration:none;display:inline-flex;align-items:center">Download Web Connector file (.QWC)</a>
+        </div>
+        <p id="qbStatus" style="font-size:12px;color:#52647a;margin:10px 0 0">Connect Web Connector once, then queue a date range and click Update Selected in Web Connector.</p>
+      </div>
+      <div id="status" class="status-box"></div>
+      <div id="fileList"></div>
+      <div class="empty-hint" id="emptyHint">No sheets yet.</div>
+    </div>
+
+    <div class="kpi-column">
+      <div class="mini-card"><div class="mini-label">Workflow</div><div class="mini-value">01</div><div class="mini-note">Upload monthly exports</div></div>
+      <div class="mini-card"><div class="mini-label">Analysis</div><div class="mini-value">02</div><div class="mini-note">Select teams &amp; groups</div></div>
+      <div class="mini-card"><div class="mini-label">Reporting</div><div class="mini-value">03</div><div class="mini-note">Build charts &amp; PDFs</div></div>
+      <div class="action-card"><h3>Built for monthly P&amp;L</h3><p>Compare revenue sources, companies, groups and P&amp;L stages in one workspace.</p></div>
+    </div>
+  </div>
+
+  <div class="panel2" id="companyPanel">
+    <div class="section-head">
+      <div><h2>P&amp;L analysis</h2><p>Choose the companies or groups you want to inspect.</p></div>
+      <div class="eyebrow">Live breakdown</div>
+    </div>
+    <div class="field">
+      <label id="selectionTreeLabel">Select any combination — groups, whole-group totals, and/or individual teams</label>
+      <div id="selectionTree"></div>
+      <div class="selCount" id="selCount"></div>
+    </div>
+    <div id="companyResults"></div>
+    <button id="downloadSelectionBtn" style="display:none">↓ Download Excel</button>
+    <button id="downloadSelectionPdfBtn" style="display:none">↓ Download P&amp;L PDF</button>
+    <button id="downloadPdfBtn">↓ Download Revenue PDF</button>
+    <button id="downloadFullPdfBtn" style="display:none">↓ Download Full Report (P&amp;L + Graphs) — 1 PDF</button>
+    <button id="compareBtn">⇄ Comparison in Amount</button>
+    <div class="compare-panel" id="comparePanel">
+      <h3>Comparison in Amount</h3>
+      <div class="hint">Difference between months for the companies ticked in the list above — amount (Rs), percentage and USD (each month at its own sheet's USD rate). Every pair of ticked months is compared (later month vs earlier month); with 3+ months the first → last pair is marked OVERALL.</div>
+      <div class="field"><label>Months to compare (tick 2 or more — compared in upload order)</label><div id="compareMonths" class="graph-list"></div></div>
+      <div class="hint">Companies: <b id="compareCompCount">none ticked</b></div>
+      <button id="runCompareBtn">Calculate comparison</button>
+      <button id="downloadCompareBtn" style="display:none">↓ Download Comparison Excel</button>
+      <div id="compareStatus" class="hint"></div>
+      <div id="compareResult"></div>
+    </div>
+    <div id="chartsArea"></div>
+  </div>
+</div>
+
+<div class="graph-builder" id="graphBuilder">
+  <div class="section-head">
+    <div><div class="eyebrow">Visual analytics</div><h2>Graph Builder</h2><p class="hint">Compare monthly performance, P&amp;L stages or individual ad/revenue sources.</p></div>
+  </div>
+  <div class="graph-grid">
+    <div class="graph-box"><h3>01 · Select months</h3><label class="graph-check select-all"><input type="checkbox" id="selAllMonths"><span><b>Select all</b></span></label><div id="graphMonths" class="graph-list"></div></div>
+    <div class="graph-box"><h3>02 · Select companies / groups</h3><label class="graph-check select-all"><input type="checkbox" id="selAllCompanies"><span><b>Select all</b></span></label><div id="graphCompanies" class="graph-list"></div></div>
+  </div>
+  <div class="graph-controls">
+    <div><label for="graphMode">Comparison</label><select id="graphMode"><option value="companies">Companies / Groups</option><option value="ads">Ads / Revenue Sources</option><option value="cogs">COGS / Expense Items</option><option value="opex">OPEX / Operating + Other Expense</option><option value="revcogs">Revenue vs COGS</option><option value="revopex">Revenue vs OPEX</option></select></div>
+    <div><label for="graphType">Graph type</label><select id="graphType"><option value="bar">Bar — compare</option><option value="line">Line — month trend</option></select></div>
+    <div id="metricBox"><label for="graphMetric">Metric</label><select id="graphMetric"><option value="revenue">Revenue</option><option value="cogs">COGS</option><option value="gross_profit">Gross Profit</option><option value="operating_expense">Operating Expense</option><option value="net_operational_income">Net Operational Income</option><option value="other_income">Other Income</option><option value="other_expense">Other Expense</option><option value="net_other_income">Net Other Income</option><option value="net_income">Net Profit / Loss</option></select></div>
+    <div><label for="graphCurrency">Display currency</label><select id="graphCurrency"><option value="USD">USD ($)</option><option value="PKR">PKR (Rs)</option></select></div>
+  </div>
+  <div class="graph-controls" style="grid-template-columns:1fr 1fr 1fr; margin-top:10px;">
+    <div class="hint" style="align-self:end">Each month is converted with its own sheet's USD rate.</div>
+    <div style="display:flex;align-items:end;gap:8px;"><button type="button" id="downloadGraphSvgBtn" style="background:#35658a">↓ SVG</button><button type="button" id="downloadGraphPngBtn" style="background:#7a4f9a">↓ PNG</button></div>
+    <div style="display:flex;align-items:end;"><button type="button" id="downloadGraphCsvBtn" style="background:#4d7651">↓ CSV</button></div>
+  </div>
+  <div class="graph-box" id="adOptionsBox" style="margin-top:16px;display:none">
+    <h3 id="adOptionsTitle">03 · Select ads / revenue sources</h3>
+    <button type="button" id="loadAdOptionsBtn" style="width:auto;background:#496b8a">Load ad options</button>
+    <label class="graph-check select-all" style="margin-top:10px"><input type="checkbox" id="selAllItems"><span><b>Select all</b></span></label>
+    <div id="graphAds" class="graph-list"></div>
+  </div>
+  <button id="buildGraphBtn">Build Graph</button>
+  <div id="graphStatus"></div>
+  <div id="graphResult" style="display:none"></div>
+</div>
+
+<script>
+  // Every chart is drawn on a WHITE background, so "Save image as" never gives a transparent picture.
+  Chart.register({
+    id: 'whiteBgAll',
+    beforeDraw(c) {
+      const x = c.ctx;
+      x.save();
+      x.globalCompositeOperation = 'destination-over';
+      x.fillStyle = '#ffffff';
+      x.fillRect(0, 0, c.width, c.height);
+      x.restore();
+    }
+  });
+
+  const ROLE = '__ROLE__';
+  const IS_ADMIN = ROLE === 'admin';
+  const PERMS = __PERMS__;   // {view, upload, download, edit} — set per user in User Management (server enforces too)
+  const CAN_VIEW = !!PERMS.view, CAN_UPLOAD = !!PERMS.upload, CAN_DOWNLOAD = !!PERMS.download, CAN_EDIT = !!PERMS.edit;
+  const CAN_RATE = CAN_UPLOAD || CAN_EDIT;   // accountant: own company only (server enforces)
+  ['view','upload','download','edit'].forEach(k => { if (!PERMS[k]) document.body.classList.add('no-' + k); });
+  if (!CAN_VIEW) document.getElementById('noViewNote').style.display = 'block';
+  document.body.classList.add(ROLE === 'admin' ? 'admin' : ROLE === 'accountant' ? 'accountant' : 'guest');
+  document.getElementById('roleLabel').textContent = IS_ADMIN ? 'Administrator' : ROLE === 'accountant' ? 'Accountant' : 'Guest';
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const statusEl = document.getElementById('status');
+  const rateInput = document.getElementById('rate');
+  const saveRateBtn = document.getElementById('saveRateBtn');
+  const clearRateBtn = document.getElementById('clearRateBtn');
+  const savedRateBadge = document.getElementById('savedRateBadge');
+  const rateSaveMessage = document.getElementById('rateSaveMessage');
+  const RATE_STORAGE_KEY = 'rs_usd_ledger_exchange_rate';
+
+  function syncRatePill() { /* header pill shows the signed-in role now */ }
+
+  function markRateUnsaved() {
+    const v = parseFloat(rateInput.value);
+    const saved = parseFloat(localStorage.getItem(RATE_STORAGE_KEY));
+    if (v > 0 && Math.abs(v - saved) < 0.000001) {
+      savedRateBadge.textContent = 'Saved'; savedRateBadge.classList.add('saved');
+      rateSaveMessage.textContent = 'This default will be pre-filled for your next uploads.';
+    } else {
+      savedRateBadge.textContent = 'Unsaved'; savedRateBadge.classList.remove('saved');
+      rateSaveMessage.textContent = 'Click Save Rate to keep this default for your next session.';
+    }
+  }
+
+  function loadSavedRate() {
+    const saved = parseFloat(localStorage.getItem(RATE_STORAGE_KEY));
+    if (saved > 0) { rateInput.value = saved; }
+    syncRatePill(); markRateUnsaved();
+  }
+
+  rateInput.addEventListener('input', () => { syncRatePill(); markRateUnsaved(); });
+  saveRateBtn.addEventListener('click', () => {
+    const v = parseFloat(rateInput.value);
+    if (!v || v <= 0) {
+      setStatus('Enter a valid rate first.', 'error');
+      rateInput.focus();
+      return;
+    }
+    localStorage.setItem(RATE_STORAGE_KEY, String(v));
+    syncRatePill(); markRateUnsaved();
+    setStatus('Default rate saved: 1 USD = ' + v.toLocaleString(undefined,{maximumFractionDigits:2}) + ' PKR (used for new uploads only).', 'ok');
+  });
+  clearRateBtn.addEventListener('click', () => {
+    localStorage.removeItem(RATE_STORAGE_KEY);
+    rateInput.value = ''; syncRatePill(); markRateUnsaved();
+    setStatus('Saved default rate cleared.', '');
+  });
+  loadSavedRate();
+
+  const fileListEl = document.getElementById('fileList');
+  const emptyHint = document.getElementById('emptyHint');
+
+  dropzone.onclick = () => fileInput.click();
+  dropzone.ondragover = e => { e.preventDefault(); dropzone.classList.add('drag'); };
+  dropzone.ondragleave = () => dropzone.classList.remove('drag');
+  dropzone.ondrop = e => { e.preventDefault(); dropzone.classList.remove('drag'); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); };
+  fileInput.onchange = e => { if (e.target.files.length) addFiles(e.target.files); fileInput.value = ''; };
+
+  function setStatus(msg, kind) { statusEl.textContent = msg; statusEl.className = kind || ''; }
+
+  const companyPanel = document.getElementById('companyPanel');
+  const selectionTree = document.getElementById('selectionTree');
+  const selectionTreeLabel = document.getElementById('selectionTreeLabel');
+  const selCount = document.getElementById('selCount');
+  const companyResults = document.getElementById('companyResults');
+  const downloadSelectionBtn = document.getElementById('downloadSelectionBtn');
+  const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+  const downloadFullPdfBtn = document.getElementById('downloadFullPdfBtn');
+  const downloadSelectionPdfBtn = document.getElementById('downloadSelectionPdfBtn');
+  const chartsArea = document.getElementById('chartsArea');
+  const graphMonthsEl = document.getElementById('graphMonths');
+  const graphCompaniesEl = document.getElementById('graphCompanies');
+  const graphModeEl = document.getElementById('graphMode');
+  const graphTypeEl = document.getElementById('graphType');
+  const graphMetricEl = document.getElementById('graphMetric');
+  const metricBox = document.getElementById('metricBox');
+  const adOptionsBox = document.getElementById('adOptionsBox');
+  const graphAdsEl = document.getElementById('graphAds');
+  const loadAdOptionsBtn = document.getElementById('loadAdOptionsBtn');
+  const buildGraphBtn = document.getElementById('buildGraphBtn');
+  const graphStatus = document.getElementById('graphStatus');
+  const graphResult = document.getElementById('graphResult');
+  let structure = null; // { groups: [...], standalone: [...], grand_total_col }
+
+  // Every sheet lives on the server (admin uploads, everyone can view).
+  // `rate` = THIS sheet's own PKR-per-USD rate (null until the administrator sets it).
+  let uploadedFiles = []; // { id, file, name, included, rate }
+
+  // Months may be uploaded in ANY order; everywhere (lists, graphs, tables, exports) they are shown in calendar order.
+  // Name like "October", "Oct 2025", "2025-10" -> sorted by (year, month). Names with no month keep upload order, at the end.
+  const MONTH_NAMES = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  function monthSortKey(name) {
+    const s = String(name).toLowerCase();
+    const m = s.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*/);
+    const y = s.match(/\b(20\d{2})\b/);
+    let mo = m ? MONTH_NAMES.indexOf(m[1]) : -1;
+    if (mo < 0) { const n = s.match(/\b(20\d{2})[-_ \/.](0?[1-9]|1[0-2])\b/); if (n) mo = parseInt(n[2], 10) - 1; }
+    return mo < 0 ? Infinity : (y ? parseInt(y[1], 10) : (s.match(/\b(20\d{2})[-_ \/.]/) ? parseInt(s.match(/\b(20\d{2})[-_ \/.]/)[1], 10) : 0)) * 12 + mo;
+  }
+  function sortUploadedByMonth() {
+    uploadedFiles = uploadedFiles.map((f, i) => ({f, i, k: monthSortKey(f.name)}))
+      .sort((a, b) => (a.k === b.k ? a.i - b.i : a.k - b.k)).map(x => x.f);   // stable
+  }
+
+  function authFail(res) { if (res.status === 401) { location.href = '/login'; return true; } return false; }
+
+  // ---- companies (workspaces): every company has its own sheets; only ENABLED ones are visible to guests ----
+  let companies = [];
+  let currentCompanyId = null;
+  const coSelect = document.getElementById('companySelect');
+  const coState = document.getElementById('coState');
+  const coCount = document.getElementById('coCount');
+  const coEmpty = document.getElementById('coEmpty');
+  const coToggleBtn = document.getElementById('coToggleBtn');
+  const currentCompany = () => companies.find(c => c.id === currentCompanyId) || null;
+
+  async function loadCompanies(keepId) {
+    const res = await fetch('/api/companies');
+    if (authFail(res)) return;
+    if (!res.ok) { setStatus('Could not load the companies.', 'error'); return; }
+    companies = (await res.json()).companies;
+    let want = keepId || currentCompanyId;
+    try { want = want || localStorage.getItem('pls_company'); } catch (e) {}
+    const visible = companies.filter(c => IS_ADMIN || c.enabled);
+    if (!visible.some(c => c.id === want)) {
+      const firstOn = visible.find(c => c.enabled) || visible[0];
+      want = firstOn ? firstOn.id : null;
+    }
+    currentCompanyId = want;
+    renderCompanyBar();
+    await loadServerSheets();
+  }
+
+  function renderCompanyBar() {
+    coSelect.innerHTML = companies.map(c =>
+      `<option value="${c.id}" ${c.id === currentCompanyId ? 'selected' : ''}>${esc(c.name)}${c.enabled ? '' : '  (disabled)'}</option>`).join('');
+    const c = currentCompany();
+    document.getElementById('coBar').style.display = companies.length ? 'flex' : (IS_ADMIN ? 'flex' : 'none');
+    coSelect.style.display = companies.length ? '' : 'none';
+    coState.style.display = c ? '' : 'none';
+    coState.className = 'co-state ' + (c && c.enabled ? 'co-on' : 'co-off');
+    coState.textContent = c && c.enabled ? 'Enabled' : 'Disabled';
+    coCount.textContent = c ? c.sheet_count + ' sheet(s)' : '';
+    coToggleBtn.textContent = c && c.enabled ? 'Disable' : 'Enable';
+    ['coToggleBtn', 'coRenameBtn', 'coDeleteBtn'].forEach(id => document.getElementById(id).style.display = c ? '' : 'none');
+    const none = !companies.length;
+    coEmpty.style.display = none ? 'block' : 'none';
+    coEmpty.textContent = IS_ADMIN ? 'No company yet. Click "+ New company", then upload that company\'s monthly sheets.'
+                                   : 'No company is enabled yet. Please ask the administrator.';
+    document.getElementById('upload').style.display = none ? 'none' : '';
+    if (none) { document.getElementById('companyPanel').style.display = 'none'; }
+  }
+
+  coSelect.addEventListener('change', async () => {
+    currentCompanyId = coSelect.value;
+    try { localStorage.setItem('pls_company', currentCompanyId); } catch (e) {}
+    renderCompanyBar();
+    await loadServerSheets();
+  });
+
+  document.getElementById('coNewBtn').addEventListener('click', async () => {
+    const name = (prompt('New company name:') || '').trim();
+    if (!name) return;
+    const fd = new FormData(); fd.append('name', name);
+    const res = await fetch('/api/companies', { method: 'POST', body: fd });
+    if (authFail(res)) return;
+    if (!res.ok) { let m = 'Could not create the company.'; try { m = (await res.json()).detail || m; } catch (e) {} setStatus(m, 'error'); return; }
+    const { company } = await res.json();
+    try { localStorage.setItem('pls_company', company.id); } catch (e) {}
+    await loadCompanies(company.id);
+    setStatus('"' + company.name + '" created and enabled. Now upload its monthly sheets.', 'ok');
+  });
+
+  coToggleBtn.addEventListener('click', async () => {
+    const c = currentCompany(); if (!c) return;
+    const fd = new FormData(); fd.append('enabled', c.enabled ? 'false' : 'true');
+    const res = await fetch('/api/companies/' + c.id, { method: 'PUT', body: fd });
+    if (authFail(res)) return;
+    if (!res.ok) { setStatus('Could not change the company.', 'error'); return; }
+    await loadCompanies(c.id);
+    setStatus('"' + c.name + '" is now ' + (c.enabled ? 'disabled (hidden from guests).' : 'enabled (visible to guests).'), 'ok');
+  });
+
+  document.getElementById('coRenameBtn').addEventListener('click', async () => {
+    const c = currentCompany(); if (!c) return;
+    const name = (prompt('Rename company:', c.name) || '').trim();
+    if (!name || name === c.name) return;
+    const fd = new FormData(); fd.append('name', name);
+    const res = await fetch('/api/companies/' + c.id, { method: 'PUT', body: fd });
+    if (authFail(res)) return;
+    if (!res.ok) { let m = 'Could not rename.'; try { m = (await res.json()).detail || m; } catch (e) {} setStatus(m, 'error'); return; }
+    await loadCompanies(c.id);
+  });
+
+  document.getElementById('coDeleteBtn').addEventListener('click', async () => {
+    const c = currentCompany(); if (!c) return;
+    if (!confirm('Delete company "' + c.name + '" and ALL ' + c.sheet_count + ' of its sheets for everyone? This cannot be undone.')) return;
+    const res = await fetch('/api/companies/' + c.id, { method: 'DELETE' });
+    if (authFail(res)) return;
+    if (!res.ok) { setStatus('Could not delete the company.', 'error'); return; }
+    currentCompanyId = null;
+    await loadCompanies();
+  });
+
+  async function loadServerSheets() {
+    // new company -> clear the old graph / comparison output
+    try { if (chartInst) { chartInst.destroy(); chartInst = null; } graphResult.style.display = 'none'; graphResult.innerHTML = ''; graphWasBuilt = false; } catch (e) {}
+    if (!currentCompanyId) {
+      uploadedFiles = []; renderFileList(); refreshStructureAndCalc(); setStatus('', ''); return;
+    }
+    setStatus('Loading saved sheets…', '');
+    const res = await fetch('/api/sheets?company_id=' + encodeURIComponent(currentCompanyId));
+    if (authFail(res)) return;
+    if (!res.ok) { setStatus('Could not load the saved sheets.', 'error'); return; }
+    const { sheets } = await res.json();
+    const loaded = [];
+    for (const sh of sheets) {
+      const r = await fetch('/api/sheets/' + sh.id + '/file');
+      if (!r.ok) continue;
+      const blob = await r.blob();
+      loaded.push({ id: sh.id, file: new File([blob], sh.filename || (sh.name + '.xlsx')), name: sh.name, included: true, rate: sh.rate || null });
+    }
+    uploadedFiles = loaded;
+    sortUploadedByMonth();
+    setStatus(loaded.length
+      ? loaded.length + ' sheet(s) ready.' + (CAN_UPLOAD ? ' Set each sheet\'s USD rate, then tick groups/teams below.' : ' Tick groups/teams below to view.')
+      : (CAN_UPLOAD ? 'No sheets for this company yet — upload a monthly P&L export.' : 'No sheets uploaded for this company yet.'), '');
+    renderFileList();
+    refreshStructureAndCalc();
+  }
+
+  // QuickBooks Desktop Web Connector sync controls (administrator only).
+  const qbPanel = document.getElementById('quickbooksPanel');
+  if (!IS_ADMIN) qbPanel.style.display = 'none';
+  if (IS_ADMIN) {
+    const qbFrom = document.getElementById('qbFromDate'), qbTo = document.getElementById('qbToDate');
+    const qbToday = new Date(), qbFirst = new Date(qbToday.getFullYear(), qbToday.getMonth(), 1);
+    const isoDate = d => [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
+    qbFrom.value = isoDate(qbFirst); qbTo.value = isoDate(new Date(qbToday.getFullYear(), qbToday.getMonth()+1, 0));
+    const qbStatus = document.getElementById('qbStatus');
+    fetch('/api/quickbooks/status').then(r => r.ok ? r.json() : null).then(s => {
+      if (!s) return;
+      if (!s.configured) qbStatus.textContent = 'Server setup required: configure PLS_PUBLIC_URL and QBWC_PASSWORD on your VPS, then restart PLS.';
+      else if (s.last_error) qbStatus.textContent = 'Last QuickBooks import error: ' + s.last_error;
+      else if (s.last_sync) qbStatus.textContent = 'Last sync: ' + s.last_sync.company + ' · ' + s.last_sync.period;
+    }).catch(() => {});
+    document.getElementById('qbQueueBtn').addEventListener('click', async () => {
+      if (!currentCompanyId) { qbStatus.textContent = 'Select a PLS company first.'; return; }
+      if (!qbFrom.value || !qbTo.value) { qbStatus.textContent = 'Choose both dates.'; return; }
+      qbStatus.textContent = 'Queueing QuickBooks P&L request…';
+      try {
+        const res = await fetch('/api/quickbooks/sync', {method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({company_id:currentCompanyId,start_date:qbFrom.value,end_date:qbTo.value})});
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Could not queue QuickBooks sync.');
+        qbStatus.textContent = data.message;
+      } catch (e) { qbStatus.textContent = e.message; }
+    });
+  }
+
+  async function addFiles(fileListObj) {
+    if (!CAN_UPLOAD) return;
+    const picked = Array.from(fileListObj).filter(f => f.name.toLowerCase().endsWith('.xlsx'));
+    if (!picked.length) { setStatus('Please choose .xlsx file(s).', 'error'); return; }
+    const def = parseFloat(rateInput.value);
+    const fd = new FormData();
+    picked.forEach(f => fd.append('files', f));
+    if (def > 0) fd.append('rate', def);
+    if (!currentCompanyId) { setStatus('Create / select a company first.', 'error'); return; }
+    fd.append('company_id', currentCompanyId);
+    setStatus('Uploading…', '');
+    const res = await fetch('/api/sheets', { method: 'POST', body: fd });
+    if (authFail(res)) return;
+    if (!res.ok) { let m = 'Upload failed.'; try { m = (await res.json()).detail || m; } catch (e) {} setStatus(m, 'error'); return; }
+    const { sheets } = await res.json();
+    { const c = currentCompany(); if (c) { c.sheet_count += sheets.length; renderCompanyBar(); } }
+    sheets.forEach((sh, i) => uploadedFiles.push({ id: sh.id, file: picked[i], name: sh.name, included: true, rate: sh.rate || null }));
+    sortUploadedByMonth();
+    const unrated = sheets.filter(sh => !sh.rate).length;
+    setStatus(sheets.length + ' sheet(s) uploaded and saved.' + (unrated ? ' Now set the USD rate on ' + (unrated === 1 ? 'that sheet' : 'each new sheet') + ' (row below).' : ''), unrated ? '' : 'ok');
+    renderFileList();
+    refreshStructureAndCalc();
+  }
+
+  async function removeFile(id) {
+    if (!CAN_EDIT) return;
+    const f = uploadedFiles.find(x => x.id === id);
+    if (!f || !confirm('Remove "' + f.name + '" for everyone (administrator and guests)?')) return;
+    const res = await fetch('/api/sheets/' + id, { method: 'DELETE' });
+    if (!res.ok) { setStatus('Could not remove that sheet.', 'error'); return; }
+    uploadedFiles = uploadedFiles.filter(x => x.id !== id);
+    { const c = currentCompany(); if (c && c.sheet_count > 0) { c.sheet_count -= 1; renderCompanyBar(); } }
+    renderFileList();
+    refreshStructureAndCalc();
+  }
+
+  function toggleIncluded(id) {
+    const f = uploadedFiles.find(x => x.id === id);
+    if (f) f.included = !f.included;
+    refreshStructureAndCalc();
+  }
+
+  async function saveSheetRate(id, value) {
+    const v = parseFloat(value);
+    if (!v || v <= 0) { setStatus('Enter a valid USD rate for this sheet.', 'error'); return; }
+    const fd = new FormData(); fd.append('rate', v);
+    const res = await fetch('/api/sheets/' + id + '/rate', { method: 'PUT', body: fd });
+    if (authFail(res)) return;
+    if (!res.ok) { setStatus('Could not save the rate.', 'error'); return; }
+    const f = uploadedFiles.find(x => x.id === id);
+    if (f) { f.rate = v; setStatus('USD rate saved for "' + f.name + '": 1 USD = ' + v.toLocaleString(undefined,{maximumFractionDigits:4}) + ' PKR.', 'ok'); }
+    renderFileList();
+    if (structure) onSelectionChange();
+    syncGraphWithSheets();
+  }
+
+  // ---- per-sheet rates helpers ----
+  function ratesOf(files) { return JSON.stringify(files.map(f => f.rate || 0)); }
+  function ratesReady(files) {
+    const miss = files.filter(f => !(f.rate > 0));
+    if (miss.length) { setStatus('USD rate missing for: ' + miss.map(f => f.name).join(', ') + (CAN_UPLOAD ? ' — set it on the sheet row.' : ' — ask the administrator to set it.'), 'error'); return false; }
+    return true;
+  }
+
+  function renderFileList() {
+    emptyHint.style.display = uploadedFiles.length ? 'none' : 'block';
+    emptyHint.textContent = CAN_UPLOAD ? 'No sheets yet. Start by adding a monthly P&L export.' : 'No sheets uploaded by the administrator yet.';
+    fileListEl.innerHTML = uploadedFiles.map(f => {
+      const missing = !(f.rate > 0);
+      const rateCell = CAN_RATE
+        ? `<div class="rate-cell ${missing ? 'missing' : ''}"><span>1 USD =</span><input type="number" min="0" step="0.01" class="sheetRate" data-id="${f.id}" value="${f.rate || ''}" placeholder="rate"><span>PKR</span><button type="button" data-action="saverate" data-id="${f.id}">Save</button></div>`
+        : `<div class="rate-cell"><span class="rate-ro ${missing ? 'missing' : ''}">${missing ? 'Rate not set' : '1 USD = ' + Number(f.rate).toLocaleString(undefined,{maximumFractionDigits:4}) + ' PKR'}</span></div>`;
+      return `
+      <div class="file-row">
+        <input type="checkbox" ${f.included ? 'checked' : ''} data-id="${f.id}" class="fileIncludeCb">
+        <div class="file-name">${esc(f.name)}</div>
+        ${rateCell}
+        <button type="button" class="file-usd-btn" data-id="${f.id}" data-action="usd">Download this month (USD col)</button>
+        ${CAN_EDIT ? `<button type="button" class="file-remove-btn" data-id="${f.id}" data-action="remove">Remove</button>` : ''}
+      </div>`;
+    }).join('');
+
+    fileListEl.querySelectorAll('.fileIncludeCb').forEach(cb => {
+      cb.addEventListener('change', () => toggleIncluded(cb.dataset.id));
+    });
+    fileListEl.querySelectorAll('button[data-action="remove"]').forEach(btn => {
+      btn.addEventListener('click', () => removeFile(btn.dataset.id));
+    });
+    fileListEl.querySelectorAll('button[data-action="usd"]').forEach(btn => {
+      btn.addEventListener('click', () => downloadSingleMonthUsd(btn.dataset.id));
+    });
+    fileListEl.querySelectorAll('button[data-action="saverate"]').forEach(btn => {
+      btn.addEventListener('click', () => saveSheetRate(btn.dataset.id, fileListEl.querySelector('.sheetRate[data-id="' + btn.dataset.id + '"]').value));
+    });
+    fileListEl.querySelectorAll('.sheetRate').forEach(inp => {
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') saveSheetRate(inp.dataset.id, inp.value); });
+    });
+    renderCompareMonths();
+  }
+
+  async function downloadSingleMonthUsd(id) {
+    const f = uploadedFiles.find(x => x.id === id);
+    if (!f) return;
+    if (!ratesReady([f])) return;
+    const fd = new FormData();
+    fd.append('file', f.file);
+    fd.append('rate', f.rate);
+    const res = await fetch('/process', { method: 'POST', body: fd });
+    if (!res.ok) { setStatus('Download failed for ' + f.name + '.', 'error'); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = f.name + '_with_USD.xlsx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function includedFiles() { return uploadedFiles.filter(f => f.included); }
+
+  function renderGraphSelectors() {
+    // keep the user's ticks across a re-render (sheet added/removed/included/excluded)
+    const monthOff = new Set(Array.from(document.querySelectorAll('.graphMonthCb:not(:checked)')).map(x => x.dataset.id));
+    const coOn = new Set(Array.from(document.querySelectorAll('.graphCompanyCb:checked')).map(x => x.dataset.col));
+    const graphFiles = includedFiles();   // graph months follow the sheets ticked at the top
+    graphMonthsEl.innerHTML = graphFiles.length ? graphFiles.map(f => `<label class="graph-check"><input type="checkbox" class="graphMonthCb" data-id="${f.id}" ${monthOff.has(f.id) ? '' : 'checked'}><span>${esc(f.name)}</span></label>`).join('') : '<div class="hint">Upload month files first.</div>';
+    if (!structure) { graphCompaniesEl.innerHTML = '<div class="hint">Upload a file first.</div>'; return; }
+    let html = `<label class="graph-check"><input type="checkbox" class="graphCompanyCb" data-col="${structure.grand_total_col}" data-name="Overall (Grand Total)"><span>Overall (Grand Total)</span></label>`;
+    structure.groups.forEach(g => {
+      if (g.total_col) html += `<label class="graph-check"><input type="checkbox" class="graphCompanyCb" data-col="${g.total_col}" data-name="${esc(g.name)} — whole group total"><span><b>${esc(g.name)} — whole group total</b></span></label>`;
+      g.members.forEach(m => html += `<label class="graph-check"><input type="checkbox" class="graphCompanyCb" data-col="${m.col}" data-name="${esc(m.name)}"><span>${esc(m.name)}</span></label>`);
+    });
+    structure.standalone.forEach(x => html += `<label class="graph-check"><input type="checkbox" class="graphCompanyCb" data-col="${x.col}" data-name="${esc(x.name)}"><span>${esc(x.name)}</span></label>`);
+    graphCompaniesEl.innerHTML = html;
+    graphCompaniesEl.querySelectorAll('.graphCompanyCb').forEach(cb => { if (coOn.has(cb.dataset.col)) cb.checked = true; });
+  }
+
+  // Re-draw the graph section when the sheets / rates at the top change.
+  let graphWasBuilt = false;
+  async function syncGraphWithSheets() {
+    if (!graphWasBuilt) return;
+    const {months, companies, rate} = graphPayload();
+    if (!months.length || !companies.length) {
+      try { if (chartInst) { chartInst.destroy(); chartInst = null; } } catch (e) {}
+      graphResult.style.display = 'none'; graphResult.innerHTML = '';
+      graphStatus.textContent = 'Select month(s) and company/group(s), then build the graph again.';
+      return;   // graphWasBuilt stays true: it redraws as soon as a selection exists again
+    }
+    if (!rate) {   // e.g. a just-uploaded sheet with no USD rate yet: keep the current graph, refresh once the rate is saved
+      graphStatus.textContent = 'Set the USD rate on every selected sheet to refresh the graph.';
+      return;
+    }
+    if (isSourceMode()) {
+      const prev = new Set(selectedAdNames());
+      await loadAdOptionsBtn.onclick();
+      document.querySelectorAll('.graphAdCb').forEach(cb => { cb.checked = prev.has(cb.dataset.name); });
+    }
+    await buildGraphBtn.onclick();
+  }
+
+  async function refreshStructureAndCalc() {
+    const inc = includedFiles();
+    if (!inc.length) {
+      companyPanel.style.display = 'none';
+      selectionTree.innerHTML = '';
+      selCount.textContent = '';
+      companyResults.innerHTML = '';
+      downloadSelectionBtn.style.display = 'none'; downloadSelectionPdfBtn.style.display = 'none';
+      structure = null;
+      renderGraphSelectors();
+      syncGraphWithSheets();
+      return;
+    }
+    const fd = new FormData();
+    inc.forEach(f => fd.append('files', f.file));   // union of teams across ALL selected months
+    const res = await fetch('/structure', { method: 'POST', body: fd });
+    if (!res.ok) { setStatus('Could not read that file — is it the right P&L export?', 'error'); return; }
+    structure = await res.json();
+    renderGraphSelectors();
+    selectionTreeLabel.textContent = inc.length > 1
+      ? 'Select any combination — combined across ' + inc.length + ' selected months (' + inc.map(f => f.name).join(', ') + ')'
+      : 'Select any combination — groups, whole-group totals, and/or individual teams';
+    buildSelectionTree();
+    companyPanel.style.display = 'block';
+    onSelectionChange();
+    syncGraphWithSheets();
+  }
+
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function checkboxRow(col, name, opts) {
+    opts = opts || {};
+    const cls = 'tree-item' + (opts.bold ? ' tree-group-total' : '');
+    return `<label class="${cls}"><input type="checkbox" class="selCb" data-col="${col}" data-name="${esc(name)}"><span>${esc(name)}</span></label>`;
+  }
+
+  function buildSelectionTree() {
+    const checkedCols = new Set(currentSelection().map(s => s.col)); // keep ticks across a file add/remove
+    let html = '';
+    html += checkboxRow(structure.grand_total_col, 'Overall (Grand Total)', { bold: true });
+    if (structure.groups.length || structure.standalone.length) html += '<hr class="tree-divider">';
+
+    structure.groups.forEach(g => {
+      if (g.total_col) {
+        html += checkboxRow(g.total_col, g.name + ' — whole group total', { bold: true });
+      } else {
+        html += `<div class="tree-item tree-group-total"><span>${esc(g.name)}</span></div>`;
+      }
+      html += '<div class="tree-members">';
+      g.members.forEach(m => { html += checkboxRow(m.col, m.name); });
+      html += '</div>';
+    });
+
+    structure.standalone.forEach(s => { html += checkboxRow(s.col, s.name); });
+
+    selectionTree.innerHTML = html;
+    selectionTree.querySelectorAll('.selCb').forEach(cb => {
+      if (checkedCols.has(parseInt(cb.dataset.col, 10))) cb.checked = true;
+      cb.addEventListener('change', onSelectionChange);
+    });
+  }
+
+  function currentSelection() {
+    return Array.from(selectionTree.querySelectorAll('.selCb:checked'))
+      .map(cb => ({ col: parseInt(cb.dataset.col, 10), name: cb.dataset.name }));
+  }
+
+  function onSelectionChange() {
+    const sel = currentSelection();
+    selCount.innerHTML = sel.length
+      ? '<div class="sel-bar"><b>' + sel.length + ' selected:</b></div><div class="sel-chips">' +
+        sel.map((s, i) => '<span class="sel-chip">' + (i + 1) + '. ' + esc(s.name) + '</span>').join('') + '</div>'
+      : '';
+    updateCompareCompanies(sel);
+    loadBreakdown(sel);
+  }
+
+
+  let breakdownSeq = 0;
+  async function loadBreakdown(sel) {
+    const mySeq = ++breakdownSeq;
+    if (!sel) sel = currentSelection();
+    const inc = includedFiles();
+    if (!sel.length || !inc.length) {
+      companyResults.innerHTML = '';
+      downloadSelectionBtn.style.display = 'none'; downloadSelectionPdfBtn.style.display = 'none';
+      downloadPdfBtn.style.display = 'none'; downloadFullPdfBtn.style.display = 'none';
+      chartsArea.innerHTML = '';
+      return;
+    }
+    companyResults.innerHTML = '<p>Loading…</p>';
+    const rate = inc.every(f => f.rate > 0);      // true when every month has its USD rate
+    const cols = sel.map(s => s.col);
+    const name = sel.map(s => s.name).join(' + ');
+    const fd = new FormData();
+    inc.forEach(f => fd.append('files', f.file));
+    fd.append('cols', cols.join(','));
+    fd.append('names', JSON.stringify(sel.map(s => s.name)));
+    if (rate) fd.append('rates', ratesOf(inc));
+    const res = await fetch('/company_breakdown', { method: 'POST', body: fd });
+    if (mySeq !== breakdownSeq) return;   // a newer selection was made meanwhile
+    if (!res.ok) { companyResults.innerHTML = '<p>Could not load breakdown.</p>'; downloadSelectionBtn.style.display = 'none'; downloadSelectionPdfBtn.style.display = 'none'; downloadPdfBtn.style.display = 'none'; downloadFullPdfBtn.style.display = 'none'; chartsArea.innerHTML = ''; return; }
+    const data = await res.json();
+    if (mySeq !== breakdownSeq) return;
+    renderCompanyTable(data, rate);
+    renderCharts(data, rate);
+    downloadSelectionBtn.style.display = 'block'; downloadSelectionPdfBtn.style.display = 'block';
+    downloadPdfBtn.style.display = 'block'; downloadFullPdfBtn.style.display = 'block';
+    downloadSelectionBtn.dataset.mode = 'multi';
+    downloadSelectionBtn.dataset.key = cols.join(',');
+    downloadSelectionBtn.dataset.name = name;
+  }
+
+  downloadSelectionBtn.onclick = async () => {
+    const inc = includedFiles();
+    if (!inc.length) return;
+    if (!ratesReady(inc)) return;
+    const fd = new FormData();
+    inc.forEach(f => fd.append('files', f.file));
+    fd.append('rates', ratesOf(inc));
+    fd.append('mode', downloadSelectionBtn.dataset.mode);
+    fd.append('key', downloadSelectionBtn.dataset.key);
+    fd.append('name', downloadSelectionBtn.dataset.name);
+    fd.append('months', inc.map(f => f.name).join(','));
+    const res = await fetch('/export', { method: 'POST', body: fd });
+    if (!res.ok) { setStatus('Export download failed.', 'error'); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = downloadSelectionBtn.dataset.name.replace(/[^A-Za-z0-9 _-]/g, '_').slice(0, 120) + '_USD.xlsx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+
+  downloadSelectionPdfBtn.onclick = async () => {
+    const inc = includedFiles();
+    const sel = currentSelection();
+    if (!inc.length || !sel.length) return;
+    if (!ratesReady(inc)) return;
+    const fd = new FormData();
+    inc.forEach(f => fd.append('files', f.file));
+    fd.append('rates', ratesOf(inc));
+    fd.append('key', sel.map(s => s.col).join(','));
+    fd.append('names', JSON.stringify(sel.map(s => s.name)));
+    fd.append('months', inc.map(f => f.name).join(','));
+    const res = await fetch('/export_pdf', { method: 'POST', body: fd });
+    if (!res.ok) { setStatus('PDF download failed.', 'error'); return; }
+    downloadBlob(await res.blob(), sel.map(s => s.name).join(' + ').replace(/[^A-Za-z0-9 _-]/g, '_').slice(0, 120) + '_PnL.pdf');
+  };
+
+  downloadFullPdfBtn.onclick = async () => {
+    const inc = includedFiles();
+    const sel = currentSelection();
+    if (!inc.length || !sel.length) return;
+    if (!ratesReady(inc)) return;
+    const fd = new FormData();
+    inc.forEach(f => fd.append('files', f.file));
+    fd.append('rates', ratesOf(inc));
+    fd.append('key', sel.map(s => s.col).join(','));
+    fd.append('names', JSON.stringify(sel.map(s => s.name)));
+    fd.append('months', inc.map(f => f.name).join(','));
+    setStatus('Building the full report (P&L + graphs)…', '');
+    const res = await fetch('/export_full_pdf', { method: 'POST', body: fd });
+    if (!res.ok) { setStatus('Full report download failed.', 'error'); return; }
+    setStatus('Full report ready.', '');
+    downloadBlob(await res.blob(), sel.map(s => s.name).join(' + ').replace(/[^A-Za-z0-9 _-]/g, '_').slice(0, 120) + '_Full_Report.pdf');
+  };
+
+  downloadPdfBtn.onclick = async () => {
+    const inc = includedFiles();
+    const sel = currentSelection();
+    if (!inc.length || !sel.length) return;
+    if (!ratesReady(inc)) return;
+    const fd = new FormData();
+    inc.forEach(f => fd.append('files', f.file));
+    fd.append('rates', ratesOf(inc));
+    fd.append('cols', sel.map(s => s.col).join(','));
+    fd.append('names', JSON.stringify(sel.map(s => s.name)));
+    const res = await fetch('/report_pdf', { method: 'POST', body: fd });
+    if (!res.ok) { setStatus('PDF report download failed.', 'error'); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Revenue_Report.pdf';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  function graphSelectedMonths() {
+    const ids = new Set(Array.from(document.querySelectorAll('.graphMonthCb:checked')).map(x => x.dataset.id));
+    return uploadedFiles.filter(f => ids.has(f.id));
+  }
+
+  function graphSelectedCompanies() {
+    return Array.from(document.querySelectorAll('.graphCompanyCb:checked')).map(x => ({col: parseInt(x.dataset.col,10), name: x.dataset.name}));
+  }
+
+  // "Select all" master checkbox for a list. Lists are re-rendered via innerHTML, so a MutationObserver keeps the
+  // master (checked / indeterminate / hidden-when-empty) in sync without touching the render functions.
+  function bindSelectAll(masterId, listEl, cbClass) {
+    const master = document.getElementById(masterId), wrap = master.closest('.select-all');
+    const boxes = () => Array.from(listEl.querySelectorAll('.' + cbClass));
+    const sync = () => {
+      const b = boxes(), on = b.filter(x => x.checked).length;
+      wrap.style.display = b.length ? '' : 'none';
+      master.checked = b.length > 0 && on === b.length;
+      master.indeterminate = on > 0 && on < b.length;
+    };
+    master.addEventListener('change', () => { boxes().forEach(x => { x.checked = master.checked; }); master.indeterminate = false; });
+    listEl.addEventListener('change', e => { if (e.target.classList && e.target.classList.contains(cbClass)) sync(); });
+    new MutationObserver(sync).observe(listEl, {childList: true});
+    sync();
+  }
+  bindSelectAll('selAllMonths', graphMonthsEl, 'graphMonthCb');
+  bindSelectAll('selAllCompanies', graphCompaniesEl, 'graphCompanyCb');
+  bindSelectAll('selAllItems', graphAdsEl, 'graphAdCb');
+
+  // 'ads' and 'cogs' modes share one pipeline: a list of items (ad sources or COGS expenses) you tick, then graph.
+  const isSourceMode = () => ['ads', 'cogs', 'opex'].includes(graphModeEl.value);
+  const isCogsMode = () => graphModeEl.value === 'cogs';
+  const isOpexMode = () => graphModeEl.value === 'opex';
+  const isVsMode = () => ['revcogs', 'revopex'].includes(graphModeEl.value);   // Revenue vs COGS / Revenue vs OPEX
+  const isCostMode = () => isCogsMode() || isOpexMode();   // expense-item modes (get the single-month Pareto)
+  const costName = () => isOpexMode() ? 'OPEX' : 'COGS';
+  const sourceKind = () => isCogsMode() ? 'COGS Item' : isOpexMode() ? 'OPEX Item' : 'Ad / Source';
+  function sourceWord() { return isCogsMode() ? 'COGS expense item' : isOpexMode() ? 'OPEX expense item' : 'ad/revenue source'; }
+  function selectedAdNames() {
+    return Array.from(document.querySelectorAll('.graphAdCb:checked')).map(x => x.dataset.name);
+  }
+
+  function graphPayload() {
+    const months = graphSelectedMonths();
+    const companies = graphSelectedCompanies();
+    const fd = new FormData();
+    const rate = months.every(f => f.rate > 0);
+    months.forEach(f => fd.append('files', f.file));
+    if (rate) fd.append('rates', ratesOf(months));
+    fd.append('cols', companies.map(x=>x.col).join(','));
+    fd.append('names', JSON.stringify(companies.map(x=>x.name)));
+    fd.append('requested_ad_names', JSON.stringify(selectedAdNames()));
+    fd.append('source', isCogsMode() ? 'cogs' : isOpexMode() ? 'opex' : 'revenue');
+    return {fd, months, companies, rate};
+  }
+
+  graphModeEl.onchange = () => {
+    const ads = isSourceMode();
+    adOptionsBox.style.display = ads ? 'block' : 'none';
+    metricBox.style.display = (ads || isVsMode()) ? 'none' : 'block';
+    if (ads) graphMetricEl.value = 'revenue';
+    graphAdsEl.innerHTML = '';   // old list belongs to the other mode
+    document.getElementById('adOptionsTitle').textContent = isCogsMode() ? '03 · Select COGS expense items' : isOpexMode() ? '03 · Select OPEX items (operating + other expense)' : '03 · Select ads / revenue sources';
+    loadAdOptionsBtn.textContent = isCogsMode() ? 'Load COGS items' : isOpexMode() ? 'Load OPEX items' : 'Load ad options';
+  };
+
+  loadAdOptionsBtn.onclick = async () => {
+    const {fd, months, companies, rate} = graphPayload();
+    if (!months.length || !companies.length || !rate) {
+      graphStatus.textContent = 'Select month(s) and company/group(s) — every selected month needs a USD rate.'; return;
+    }
+    graphStatus.textContent = 'Loading ' + sourceWord() + ' options…';
+    const res = await fetch('/graph_data', {method:'POST', body:fd});
+    if (!res.ok) { graphStatus.textContent = 'Could not load options.'; return; }
+    const data = await res.json();
+    const ads = data.ad_names || [];
+    graphAdsEl.innerHTML = ads.length ? ads.map(a => `<label class="graph-check"><input type="checkbox" class="graphAdCb" data-name="${escAttr(a)}" checked><span>${esc(a)}</span></label>`).join('') : '<div class="hint">No ' + sourceWord() + ' rows found in the selected data.</div>';
+    graphStatus.textContent = `${ads.length} ${sourceWord()} option(s) loaded.`;
+  };
+
+  buildGraphBtn.onclick = async () => {
+    const {fd, months, companies, rate} = graphPayload();
+    if (!months.length) { graphStatus.textContent = 'Select at least one month.'; return; }
+    if (!companies.length) { graphStatus.textContent = 'Select at least one company/group.'; return; }
+    if (!rate) { graphStatus.textContent = 'Every selected month needs a USD rate (administrator sets it on the sheet row).'; return; }
+    if (isSourceMode() && !selectedAdNames().length) { graphStatus.textContent = 'Load and select at least one ' + sourceWord() + '.'; return; }
+    graphStatus.textContent = 'Building graph…';
+    const res = await fetch('/graph_data', {method:'POST', body:fd});
+    if (!res.ok) { graphStatus.textContent = 'Could not build graph.'; return; }
+    const data = await res.json();
+    if (isVsMode()) {
+      renderVsGraph(data, graphTypeEl.value, graphModeEl.value);
+      graphWasBuilt = true;
+      graphStatus.textContent = `${months.length} month(s), ${companies.length} company/group(s) selected.`;
+      return;
+    }
+    renderCustomGraph(data, graphTypeEl.value, isSourceMode() ? 'ads' : graphMetricEl.value, selectedAdNames());
+    graphWasBuilt = true;
+    graphStatus.textContent = isSourceMode()
+      ? `${months.length} month(s), ${selectedAdNames().length} ${sourceWord()}(s) selected.`
+      : `${months.length} month(s), ${companies.length} company/group(s) selected.`;
+  };
+
+  let lastVsKind = null, lastVsData = null;   // set while a Revenue-vs-cost graph is on screen
+  let lastGraphSvg = '';
+  let lastGraphRows = [];
+  let lastGraphCurrency = 'USD';
+  // Every row carries its own USD value and PKR value (each month converted at ITS sheet's rate).
+  function graphValue(r) { return lastGraphCurrency==='PKR' ? Number(r.pkr||0) : Number(r.value||0); }
+  function graphOther(r) { return lastGraphCurrency==='PKR' ? Number(r.value||0) : Number(r.pkr||0); }
+  function money(r) { const sym=lastGraphCurrency==='PKR'?'Rs ':'$'; return sym+graphValue(r).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+  // ---- Graph Builder rendering (Chart.js) ---------------------------------
+  let chartInst = null;
+  // Writes the value on top of every bar — ADAPTIVE: full number if it fits inside the bar's width,
+  // else compact ($1.2M), else rotated 90° (compact), and skipped only when the bar is too thin (tooltip still has it).
+  function valueLabelsPlugin(prefixFn) {
+    return { id: 'valueLabels', afterDatasetsDraw(chart) {
+      if (chart.config.type !== 'bar') return;
+      const ctx = chart.ctx, prefix = prefixFn();
+      const full = v => (v < 0 ? '-' : '') + prefix + Math.round(Math.abs(v)).toLocaleString();
+      const short = v => (v < 0 ? '-' : '') + prefix + compact(Math.abs(v));
+      ctx.save(); ctx.fillStyle = '#111'; ctx.font = 'bold 10px sans-serif';
+      chart.data.datasets.forEach((ds, di) => {
+        const meta = chart.getDatasetMeta(di);
+        if (meta.hidden || ds.noLabels) return;
+        meta.data.forEach((bar, i) => {
+          const v = Number(ds.data[i]);
+          if (!v) return;
+          const bw = bar.width || 0;
+          let txt = full(v), rotate = false;
+          if (ctx.measureText(txt).width + 2 > bw) {
+            txt = short(v);
+            if (ctx.measureText(txt).width + 2 > bw) rotate = true;
+          }
+          if (rotate && bw < 11) return;   // too thin even for a vertical label
+          ctx.save();
+          if (rotate) {
+            ctx.translate(bar.x, v < 0 ? bar.y + 3 : bar.y - 3);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = v < 0 ? 'right' : 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(txt, 0, 0);
+          } else {
+            ctx.textAlign = 'center';
+            ctx.textBaseline = v < 0 ? 'top' : 'bottom';
+            ctx.fillText(txt, bar.x, v < 0 ? bar.y + 3 : bar.y - 3);
+          }
+          ctx.restore();
+        });
+      });
+      ctx.restore();
+    }};
+  }
+  // HTML legend that lives OUTSIDE the scrolling chart, so it stays visible for wide (many-month) charts.
+  // Click a chip to show / hide that month.
+  function htmlLegend(chart, el) {
+    el.innerHTML = '';
+    chart.data.datasets.forEach((ds, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'pnl-chip'; b.title = 'Click to show / hide';
+      b.innerHTML = '<i style="background:' + ds.backgroundColor + '"></i>' + esc(ds.label);
+      b.onclick = () => { const vis = chart.isDatasetVisible(i); chart.setDatasetVisibility(i, !vis); b.classList.toggle('off', vis); chart.update(); };
+      el.appendChild(b);
+    });
+  }
+  const PALETTE = ['#2563eb','#f97316','#16a34a','#9333ea','#dc2626','#0891b2','#ca8a04','#db2777'];
+  const TOP_N = 10;
+  const compact = n => new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(n);
+
+  // One fixed colour per ad — same ad = same colour everywhere (chart + legend).
+  const AD_PALETTE = ['#2563eb','#f97316','#16a34a','#9333ea','#dc2626','#0891b2','#ca8a04','#db2777','#65a30d','#0d9488',
+                      '#7c3aed','#ea580c','#475569','#be123c','#0284c7','#a16207','#15803d','#c026d3','#4f46e5','#b45309'];
+  let adOrder = [];
+  const TOP_ADS = 15;
+  const MONTH_RE = /\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b/i;
+  const shortMonth = s => { const m = String(s).match(MONTH_RE); return m ? m[1].slice(0,1).toUpperCase() + m[1].slice(1,3).toLowerCase() : (s.length > 10 ? s.slice(0,9) + '…' : s); };
+  const clip = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
+  // Long name -> several short lines (Chart.js draws array labels on multiple lines).
+  function wrapLabel(text, n) {
+    const words = String(text).split(/\s+/), lines = [];
+    let cur = '';
+    words.forEach(w => {
+      if ((cur + ' ' + w).trim().length <= n) cur = (cur + ' ' + w).trim();
+      else { if (cur) lines.push(cur); cur = w; }
+    });
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  function renderCustomGraph(data, type, metric, selectedAds=[]) {
+    lastVsKind = null; lastVsData = null;
+    const isAds = metric === 'ads';
+    if (isAds) {
+      if (data.ad_names && data.ad_names.length) adOrder = data.ad_names;
+      (data.ad_rows || []).forEach(r => { if (!adOrder.includes(r.ad)) adOrder.push(r.ad); });
+    }
+    const adColor = ad => AD_PALETTE[Math.max(0, adOrder.indexOf(ad)) % AD_PALETTE.length];
+
+    let rows = isAds ? (data.ad_rows || []) : (data.rows || []).filter(r => r.metric === metric);
+    if (isAds && selectedAds.length) rows = rows.filter(r => selectedAds.includes(r.ad));
+    if (!rows.length) {
+      graphResult.style.display = 'block';
+      graphResult.innerHTML = '<div class="hint">No graph data found for this selection.</div>';
+      return;
+    }
+    lastGraphCurrency = document.getElementById('graphCurrency')?.value || 'USD';
+    lastGraphRows = rows;
+
+    const cur = lastGraphCurrency === 'PKR' ? 'Rs ' : '$';
+    const currencyLabel = lastGraphCurrency === 'PKR' ? 'PKR (Rs)' : 'USD ($)';
+    const metricLabels = {revenue:'Revenue',cogs:'COGS',gross_profit:'Gross Profit',operating_expense:'Operating Expense',
+      net_operational_income:'Net Operational Income',other_income:'Other Income',other_expense:'Other Expense',
+      net_other_income:'Net Other Income',net_income:'Net Profit / Loss'};
+    const allCompanies = [...new Set(rows.map(r => r.company))];
+    const title = [(isAds ? (isCogsMode() ? 'COGS Expense Item' : isOpexMode() ? 'OPEX — Operating + Other Expense' : 'Ad / Revenue Source') : (metricLabels[metric] || metric)) + ' — ' + currencyLabel];
+    title.push(allCompanies.length + ' selected:');
+    for (let i = 0; i < allCompanies.length; i += 3) title.push(allCompanies.slice(i, i + 3).join('  |  '));
+
+    const catKey = isAds ? 'ad' : 'company';
+    const months = [...new Set(rows.map(r => r.month))];
+    const companies = [...new Set(rows.map(r => r.company))];
+    const totals = {};
+    rows.forEach(r => totals[r[catKey]] = (totals[r[catKey]] || 0) + Math.abs(graphValue(r)));
+    const limit = isAds ? (isOpexMode() ? Infinity : TOP_ADS) : TOP_N;   // OPEX shows every item
+    let cats = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
+    const hidden = Number.isFinite(limit) ? Math.max(0, cats.length - limit) : 0;
+    cats = cats.slice(0, limit);
+
+    const sumRows = f => rows.filter(f).reduce((s, r) => s + graphValue(r), 0);
+    const sumOther = f => rows.filter(f).reduce((s, r) => s + graphOther(r), 0);
+    const colorOf = (c, i) => isAds ? adColor(c) : PALETTE[i % 8];
+
+    let labels, datasets, horizontal = false, fullLabels = null, interaction = {mode: 'index', intersect: false};
+    // One month = a line has nothing to connect (single dot). For COGS show a ranked Pareto instead:
+    // bars (biggest item first) + cumulative % line.
+    const cogsSingle = isAds && isCostMode() && type === 'line' && months.length === 1;
+    if (cogsSingle) {
+      const grand = Object.values(totals).reduce((a, b) => a + b, 0) || 1;
+      let run = 0;
+      const cum = cats.map(c => { run += totals[c]; return +(run / grand * 100).toFixed(1); });
+      labels = cats.map(c => wrapLabel(c, 16));
+      fullLabels = cats.slice();
+      const multi = companies.length > 1;
+      datasets = multi
+        ? companies.map((co, i) => ({
+            type: 'bar', label: co, fullLabel: co, stack: 'cogs', yAxisID: 'y', noLabels: true,
+            data: cats.map(c => sumRows(r => r.ad === c && r.company === co)),
+            other: cats.map(c => sumOther(r => r.ad === c && r.company === co)),
+            backgroundColor: PALETTE[i % 8], borderRadius: 2 }))
+        : [{ type: 'bar', label: companies[0], fullLabel: costName(), yAxisID: 'y',
+            data: cats.map(c => sumRows(r => r.ad === c)),
+            other: cats.map(c => sumOther(r => r.ad === c)),
+            backgroundColor: cats.map(c => adColor(c)), borderRadius: 4 }];
+      datasets.push({ type: 'line', label: 'Cumulative % of total ' + costName(), isCum: true, noLabels: true, yAxisID: 'y2',
+        data: cum, borderColor: '#111827', backgroundColor: '#111827', borderWidth: 2.5, pointRadius: 4,
+        pointHoverRadius: 6, tension: 0, order: -1 });
+    } else if (type === 'line') {
+      labels = months.map(shortMonth);
+      fullLabels = months.slice();
+      datasets = cats.map((c, i) => ({
+        label: c, fullLabel: c, data: months.map(m => sumRows(r => r[catKey] === c && r.month === m)),
+        other: months.map(m => sumOther(r => r[catKey] === c && r.month === m)),
+        borderColor: colorOf(c, i), backgroundColor: colorOf(c, i),
+        tension: .25, borderWidth: 2.5, pointRadius: 4
+      }));
+    } else if (isAds) {
+      // x = Company · Month, one coloured bar per ad (colour = ad, see legend)
+      const groups = [];
+      rows.forEach(r => { if (!groups.some(g => g.company === r.company && g.month === r.month)) groups.push({company: r.company, month: r.month}); });
+      fullLabels = groups.map(g => `${g.company} — ${g.month}`);
+      labels = groups.map(g => {
+        const mo = shortMonth(g.month);
+        if (companies.length > 1 && months.length > 1) return [...wrapLabel(g.company, 14), mo];
+        return companies.length > 1 ? wrapLabel(g.company, 14) : mo;
+      });
+      datasets = cats.map(ad => ({
+        label: ad, fullLabel: ad,
+        data: groups.map(g => sumRows(r => r.ad === ad && r.company === g.company && r.month === g.month)),
+        other: groups.map(g => sumOther(r => r.ad === ad && r.company === g.company && r.month === g.month)),
+        backgroundColor: adColor(ad), borderRadius: 3
+      }));
+      interaction = {mode: 'nearest', intersect: true};
+    } else {
+      horizontal = false;   // always vertical (column) bars
+      labels = cats.map(c => horizontal ? c : wrapLabel(c, 16));
+      fullLabels = cats.slice();
+      datasets = months.map((m, i) => ({
+        label: shortMonth(m), data: cats.map(c => sumRows(r => r[catKey] === c && r.month === m)),
+        other: cats.map(c => sumOther(r => r[catKey] === c && r.month === m)),
+        backgroundColor: PALETTE[i % 8], borderRadius: 3
+      }));
+    }
+
+    const height = (type !== 'line' && horizontal)
+      ? Math.max(360, cats.length * months.length * 22 + 100) : 460;
+    const chartW = cogsSingle ? (labels.length > 12 ? labels.length * 70 : 0)
+      : (type !== 'line' && !horizontal)
+      ? Math.max(700, labels.length * Math.max(90, datasets.length * 58 + 30)) : 0;
+    const valAxis = { grace: '18%', title: { display: true, text: currencyLabel + (lastGraphCurrency === 'PKR' ? '' : '   (each month at its own sheet rate)'), font: { weight: 'bold' } },
+                      ticks: { callback: v => cur + compact(v) }, grid: { color: '#e5e7eb' } };
+    const fm = n => Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    const bothCur = (v, o) => lastGraphCurrency === 'PKR'
+      ? 'Rs ' + fm(v) + (o == null ? '' : '  |  $' + fm(o))
+      : '$' + fm(v) + (o == null ? '' : '  |  Rs ' + fm(o));
+    const catAxis = { grid: { display: false }, ticks: { maxRotation: 45, minRotation: 0, autoSkip: false } };
+
+    const tableRows = rows.map(r => `<tr><td>${esc(r.ad || r.company)}</td><td>${esc(r.month)}</td>
+      <td>${esc(r.company)}</td><td style="text-align:right;font-weight:700">${money(r)}</td></tr>`).join('');
+
+    graphResult.style.display = 'block';
+    graphResult.innerHTML =
+      `<div class="chart-note">${isAds ? (isOpexMode() ? 'OPEX = Operating Expense + Other Expense, saare items dikhaye gaye hain. Har item ka apna fixed rang hai. ' : isCogsMode() ? 'Har COGS item ka apna fixed rang hai — rang legend (neeche) se match karo. ' : 'Har ad ka apna fixed rang hai — rang legend (neeche) se match karo. ') : ''}${cogsSingle ? 'Sirf ek month select hai, isliye line ki jagah ranked bars (bada item pehle) + cumulative % line dikhayi gayi hai — dekho kaunse chand items ${costName()} ka zyada hissa hain. ' : ''}Top ${cats.length} shown${hidden ? ` (${hidden} chhote items hide hain — neeche table mein sab hain)` : ''}. Hover karke poori value dekho.</div>
+       <div style="position:relative;height:${height}px;width:${chartW ? chartW + 'px' : '100%'};min-width:100%"><canvas id="graphCanvas"></canvas></div>
+       <table class="graph-data-table"><thead><tr><th>${isAds ? sourceKind() : 'Company / Group'}</th><th>Month</th>
+       <th>Company / Group</th><th>${currencyLabel}</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+
+    if (chartInst) chartInst.destroy();
+    chartInst = new Chart(document.getElementById('graphCanvas'), {
+      type: (type === 'line' && !cogsSingle) ? 'line' : 'bar',
+      data: { labels, datasets },
+      options: {
+        indexAxis: horizontal ? 'y' : 'x',
+        responsive: true, maintainAspectRatio: false,
+        interaction,
+        plugins: {
+          title: { display: true, text: title, font: { size: 15 } },
+          legend: { position: 'bottom', labels: { boxWidth: 14, boxHeight: 14, usePointStyle: false,
+            filter: it => !(cogsSingle && companies.length === 1 && it.datasetIndex === 0) } },
+          tooltip: { callbacks: {
+            title: it => fullLabels ? fullLabels[it[0].dataIndex] : [].concat(it[0].label).join(' '),
+            label: c => c.dataset.isCum ? ` Cumulative: ${c.parsed.y.toFixed(1)}% of total ${costName()}` :
+              (cogsSingle && totals[fullLabels[c.dataIndex]] ? ` ${c.dataset.fullLabel || c.dataset.label}: ${bothCur(c.parsed.y, c.dataset.other ? c.dataset.other[c.dataIndex] : null)}  (${(totals[fullLabels[c.dataIndex]] / Object.values(totals).reduce((a, b) => a + b, 0) * 100).toFixed(1)}% of total)` :
+            ` ${c.dataset.fullLabel || c.dataset.label}: ${bothCur(c.parsed[horizontal ? 'x' : 'y'], c.dataset.other ? c.dataset.other[c.dataIndex] : null)}`) } }
+        },
+        scales: cogsSingle
+          ? { x: { ...catAxis, stacked: true }, y: { ...valAxis, stacked: true },
+              y2: { position: 'right', min: 0, max: 100, grid: { drawOnChartArea: false },
+                    ticks: { callback: v => v + '%' }, title: { display: true, text: 'Cumulative %', font: { weight: 'bold' } } } }
+          : horizontal ? { x: valAxis, y: catAxis } : { x: catAxis, y: valAxis }
+      },
+      plugins: [valueLabelsPlugin(() => cur)]
+    });
+  }
+
+  // ---- Revenue vs COGS / Revenue vs OPEX ------------------------------------
+  // Bar : one group per Company (· Month), two bars side by side (Revenue vs cost).
+  // Line: one Revenue line (solid) + one cost line (dashed) per company across months.
+  // OPEX = Operating Expense + Other Expense (same definition as the OPEX items graph).
+  function renderVsGraph(data, type, kind) {
+    lastVsKind = kind; lastVsData = data;
+    const isCogs = kind === 'revcogs';
+    const costName_ = isCogs ? 'COGS' : 'OPEX';
+    const costColor = isCogs ? '#f97316' : '#dc2626';
+    lastGraphCurrency = document.getElementById('graphCurrency')?.value || 'USD';
+    const cur = lastGraphCurrency === 'PKR' ? 'Rs ' : '$';
+    const currencyLabel = lastGraphCurrency === 'PKR' ? 'PKR (Rs)' : 'USD ($)';
+
+    // collect revenue / cost per (company, month) in both currencies
+    const pts = [], idx = {};
+    (data.rows || []).forEach(r => {
+      const k = r.company + '\u0001' + r.month;
+      const isRev = r.metric === 'revenue';
+      const isCost = isCogs ? r.metric === 'cogs' : (r.metric === 'operating_expense' || r.metric === 'other_expense');
+      if (!isRev && !isCost) return;
+      if (!(k in idx)) { idx[k] = pts.length; pts.push({company: r.company, month: r.month, revU: 0, revP: 0, costU: 0, costP: 0}); }
+      const p = pts[idx[k]];
+      if (isRev) { p.revU += Number(r.value || 0); p.revP += Number(r.pkr || 0); }
+      else { p.costU += Number(r.value || 0); p.costP += Number(r.pkr || 0); }
+    });
+    if (!pts.length) {
+      graphResult.style.display = 'block';
+      graphResult.innerHTML = '<div class="hint">No graph data found for this selection.</div>';
+      return;
+    }
+    const pick = (p, which) => lastGraphCurrency === 'PKR' ? p[which + 'P'] : p[which + 'U'];
+    const other = (p, which) => lastGraphCurrency === 'PKR' ? p[which + 'U'] : p[which + 'P'];
+    // rows for the CSV download / PNG (graphValue() reads value = USD, pkr = Rs)
+    lastGraphRows = [];
+    pts.forEach(p => {
+      lastGraphRows.push({company: p.company, month: p.month, ad: 'Revenue', value: p.revU, pkr: p.revP});
+      lastGraphRows.push({company: p.company, month: p.month, ad: costName_, value: p.costU, pkr: p.costP});
+    });
+
+    const months = [...new Set(pts.map(p => p.month))];
+    const companies = [...new Set(pts.map(p => p.company))];
+    const title = ['Revenue vs ' + costName_ + ' — ' + currencyLabel];
+    title.push(companies.length + ' selected:');
+    for (let i = 0; i < companies.length; i += 3) title.push(companies.slice(i, i + 3).join('  |  '));
+
+    const fm = n => Number(n).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const both = (v, o) => lastGraphCurrency === 'PKR' ? 'Rs ' + fm(v) + '  |  $' + fm(o) : '$' + fm(v) + '  |  Rs ' + fm(o);
+    const pct = (c, r) => r ? (c / r * 100).toFixed(1) + '%' : '—';
+    const lineMode = type === 'line' && months.length > 1;   // one month = nothing to connect -> bars
+
+    let labels, fullLabels, datasets, chartW = 0;
+    if (lineMode) {
+      labels = months.map(shortMonth); fullLabels = months.slice();
+      datasets = [];
+      companies.forEach((co, i) => {
+        const col = PALETTE[i % 8];
+        const at = m => pts.find(p => p.company === co && p.month === m);
+        datasets.push({label: co + ' — Revenue', data: months.map(m => at(m) ? pick(at(m), 'rev') : null),
+          other: months.map(m => at(m) ? other(at(m), 'rev') : null), cost: months.map(m => at(m) ? pick(at(m), 'cost') : null),
+          borderColor: col, backgroundColor: col, tension: .25, borderWidth: 2.5, pointRadius: 4});
+        datasets.push({label: co + ' — ' + costName_, data: months.map(m => at(m) ? pick(at(m), 'cost') : null),
+          other: months.map(m => at(m) ? other(at(m), 'cost') : null),
+          borderColor: col, backgroundColor: col, borderDash: [7, 4], tension: .25, borderWidth: 2.5, pointRadius: 4, pointStyle: 'rectRot'});
+      });
+    } else {
+      fullLabels = pts.map(p => p.company + ' — ' + p.month);
+      labels = pts.map(p => {
+        const mo = shortMonth(p.month);
+        if (companies.length > 1 && months.length > 1) return [...wrapLabel(p.company, 14), mo];
+        return companies.length > 1 ? wrapLabel(p.company, 14) : mo;
+      });
+      datasets = [
+        {label: 'Revenue', data: pts.map(p => pick(p, 'rev')), other: pts.map(p => other(p, 'rev')), backgroundColor: '#2563eb', borderRadius: 3},
+        {label: costName_, data: pts.map(p => pick(p, 'cost')), other: pts.map(p => other(p, 'cost')), backgroundColor: costColor, borderRadius: 3}
+      ];
+      chartW = Math.max(700, labels.length * 130);
+    }
+
+    const tableRows = pts.map(p => {
+      const rv = pick(p, 'rev'), cs = pick(p, 'cost');
+      return `<tr><td>${esc(p.company)}</td><td>${esc(p.month)}</td>
+        <td style="text-align:right">${cur}${fm(rv)}</td><td style="text-align:right">${cur}${fm(cs)}</td>
+        <td style="text-align:right">${pct(cs, rv)}</td>
+        <td style="text-align:right;font-weight:700">${rv - cs < 0 ? '-' : ''}${cur}${fm(Math.abs(rv - cs))}</td></tr>`;
+    }).join('');
+
+    graphResult.style.display = 'block';
+    graphResult.innerHTML =
+      `<div class="chart-note">${isCogs ? 'COGS' : 'OPEX = Operating Expense + Other Expense'} ko Revenue ke saath compare kiya hai. ${lineMode ? 'Solid line = Revenue, dashed line = ' + costName_ + '. ' : ''}Hover karke ${costName_} % of revenue aur difference dekho. Neeche table mein har company/month ka hisaab hai.</div>
+       <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin:8px 0;font-size:14px;font-weight:700">${lineMode
+          ? '<span>━━ Solid line = Revenue</span><span>╌╌ Dashed line = ' + costName_ + '</span><span style="font-weight:400;color:#6b7280">(same color = same company)</span>'
+          : '<span><span style="display:inline-block;width:16px;height:16px;background:#2563eb;border-radius:3px;vertical-align:-3px"></span> Blue bar = Revenue</span><span><span style="display:inline-block;width:16px;height:16px;background:' + costColor + ';border-radius:3px;vertical-align:-3px"></span> ' + (isCogs ? 'Orange' : 'Red') + ' bar = ' + costName_ + '</span><span style="font-weight:400;color:#6b7280">(left bar = Revenue, right bar = ' + costName_ + ' in every pair)</span>'}</div>
+       <div style="position:relative;height:460px;width:${chartW ? chartW + 'px' : '100%'};min-width:100%"><canvas id="graphCanvas"></canvas></div>
+       <table class="graph-data-table"><thead><tr><th>Company / Group</th><th>Month</th><th>Revenue (${cur.trim()})</th>
+       <th>${costName_} (${cur.trim()})</th><th>${costName_} % of Revenue</th><th>Revenue − ${costName_} (${cur.trim()})</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+
+    if (chartInst) chartInst.destroy();
+    chartInst = new Chart(document.getElementById('graphCanvas'), {
+      type: lineMode ? 'line' : 'bar',
+      data: {labels, datasets},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: lineMode ? {mode: 'index', intersect: false} : {mode: 'index', intersect: false},
+        plugins: {
+          title: {display: true, text: title, font: {size: 15}},
+          legend: {position: 'top', labels: {boxWidth: 14, boxHeight: 14}},
+          tooltip: { callbacks: {
+            title: it => fullLabels[it[0].dataIndex],
+            label: c => ` ${c.dataset.label}: ${c.parsed.y == null ? '—' : both(c.parsed.y, c.dataset.other[c.dataIndex])}`,
+            afterBody: it => {
+              const i = it[0].dataIndex;
+              if (lineMode) return [];
+              const rv = datasets[0].data[i], cs = datasets[1].data[i];
+              return [` ${costName_} = ${pct(cs, rv)} of Revenue`, ` Revenue − ${costName_}: ${rv - cs < 0 ? '-' : ''}${cur}${fm(Math.abs(rv - cs))}`];
+            }
+          } }
+        },
+        scales: {
+          x: {grid: {display: false}, ticks: {maxRotation: 45, minRotation: 0, autoSkip: false}},
+          y: {grace: '18%', title: {display: true, text: currencyLabel + (lastGraphCurrency === 'PKR' ? '' : '   (each month at its own sheet rate)'), font: {weight: 'bold'}},
+              ticks: {callback: v => cur + compact(v)}, grid: {color: '#e5e7eb'}}
+        }
+      },
+      plugins: [valueLabelsPlugin(() => cur)]
+    });
+  }
+
+  function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function escSvg(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  let pnlCharts = [];
+  function renderCharts(data, rate) {
+    pnlCharts.forEach(c => c.destroy()); pnlCharts = [];
+    const selections = data.selections || [];
+    if (!selections.length) { chartsArea.innerHTML = ''; return; }
+    if (!rate) { chartsArea.innerHTML = '<div class="chart-note">Graphs need a USD rate on every selected month (the administrator sets it on each sheet row).</div>'; return; }
+
+    const fullUsd = v => '$' + Number(v || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const fullBoth = (v, r) => fullUsd(v) + '  |  Rs ' + (Number(v || 0) * Number(r || 1)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const usdAxisTitle = {grace: '18%', display: true, text: 'USD ($)   —   each month at its own sheet rate; Rs shown in tooltip', font: {weight: 'bold'}};
+    const shortLbl = (s, n) => s.length > n ? s.slice(0, n - 2) + '…' : s;
+    const stages = [
+      ['total_revenue_usd', 'Revenue'],
+      ['total_cogs_usd', 'COGS'],
+      ['gross_profit_usd', 'Gross Profit'],
+      ['total_operating_expense_usd', 'Operating Exp.'],
+      ['net_operational_income_usd', 'Net Operational'],
+      ['net_income_usd', 'Net Profit / Loss']
+    ];
+
+    let html = '<div class="charts-title">P&amp;L Graphs</div>';
+    const jobs = [];
+    selections.forEach((sel, si) => {
+      const months = sel.months || [];
+      const revTotals = {};
+      months.forEach(m => (m.revenue_items || []).forEach(i => { revTotals[i.label] = (revTotals[i.label] || 0) + Number(i.usd || 0); }));
+      const topItems = Object.keys(revTotals).sort((a, b) => revTotals[b] - revTotals[a]).slice(0, 10);
+      const hiddenItems = Object.keys(revTotals).length - topItems.length;
+
+      // Width grows with (stages × months) so 12 months never get squeezed into one screen; the card scrolls sideways.
+      const stageW = Math.max(560, stages.length * (months.length * 30 + 36) + 80);
+      html += `<div class="chart-card"><h4>${escSvg(sel.name)} — P&amp;L stages (USD $ | PKR Rs)</h4>
+        <div class="pnl-legend" id="pnlStageLegend${si}"></div>
+        <div style="overflow-x:auto"><div style="position:relative;height:${months.length > 6 ? 430 : 340}px;width:${stageW}px;min-width:100%"><canvas id="pnlStage${si}"></canvas></div></div>
+        <div class="chart-note">Revenue − COGS = Gross Profit; − Operating Expense = Net Operational Income; Other Income/Expense ke baad Net Profit/Loss.</div></div>`;
+      if (topItems.length) {
+        const w = Math.max(560, topItems.length * (months.length * (months.length <= 4 ? 58 : 30) + 30) + 120);
+        html += `<div class="chart-card"><h4>${escSvg(sel.name)} — Top ${topItems.length} Revenue Sources (USD $ | PKR Rs)</h4>
+          <div class="pnl-legend" id="pnlItemsLegend${si}"></div>
+          <div style="overflow-x:auto"><div style="position:relative;height:${months.length > 6 ? 500 : 430}px;width:${w}px;min-width:100%"><canvas id="pnlItems${si}"></canvas></div></div>
+          <div class="chart-note">${hiddenItems > 0 ? hiddenItems + ' chhote sources hide hain — poori list upar table mein hai.' : ''}</div></div>`;
+      }
+      jobs.push({si, sel, months, topItems});
+    });
+    if (selections.length > 1) {
+      html += `<div class="chart-card"><h4>All ${selections.length} selected — comparison (USD $ | PKR Rs, all selected months)</h4>
+        <div style="position:relative;height:380px;min-width:560px"><canvas id="pnlCompare"></canvas></div>
+        <div class="chart-note">${selections.map((s, i) => (i + 1) + '. ' + escSvg(s.name)).join(' &nbsp;|&nbsp; ')}</div></div>`;
+    }
+    chartsArea.innerHTML = html;
+
+    if (selections.length > 1) {
+      pnlCharts.push(new Chart(document.getElementById('pnlCompare'), {
+        type: 'bar',
+        plugins: [valueLabelsPlugin(() => '$')],
+        data: {
+          labels: stages.map(s => s[1]),
+          datasets: selections.map((sel, i) => ({
+            label: sel.name, rate: (sel.total || {}).eff_rate, data: stages.map(s => Number((sel.total || {})[s[0]] || 0)),
+            backgroundColor: PALETTE[i % 8], borderRadius: 3
+          }))
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: {mode: 'index', intersect: false},
+          plugins: {legend: {position: 'bottom'}, tooltip: {callbacks: {label: c => ` ${c.dataset.label}: ${fullBoth(c.parsed.y, c.dataset.rate)}`}}},
+          scales: {x: {grid: {display: false}}, y: {title: usdAxisTitle, ticks: {callback: v => '$' + compact(v)}, grid: {color: '#e5e7eb'}}}
+        }
+      }));
+    }
+
+    const tip = {callbacks: {label: c => ` ${c.dataset.label}: ${fullBoth(c.parsed.y, c.dataset.rate)}`}};
+    jobs.forEach(({si, sel, months, topItems}) => {
+      const many = months.length > 6;
+      const stageChart = new Chart(document.getElementById('pnlStage' + si), {
+        type: 'bar',
+        plugins: [valueLabelsPlugin(() => '$')],
+        data: {
+          labels: stages.map(s => s[1]),
+          datasets: months.map((m, i) => ({
+            label: m.name, rate: m.rate, data: stages.map(s => Number(m[s[0]] || 0)),
+            backgroundColor: PALETTE[i % 8], borderRadius: 3, barPercentage: 0.95, categoryPercentage: many ? 0.9 : 0.8
+          }))
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          layout: {padding: {top: many ? 8 : 0}},
+          interaction: {mode: 'index', intersect: false},
+          plugins: {legend: {display: false}, tooltip: tip},
+          scales: {x: {grid: {display: false}}, y: {grace: many ? '25%' : '12%', title: usdAxisTitle, ticks: {callback: v => '$' + compact(v)}, grid: {color: '#e5e7eb'}}}
+        }
+      });
+      pnlCharts.push(stageChart);
+      htmlLegend(stageChart, document.getElementById('pnlStageLegend' + si));
+      if (topItems.length) {
+        const itemsChart = new Chart(document.getElementById('pnlItems' + si), {
+          type: 'bar',
+          plugins: [valueLabelsPlugin(() => '$')],
+          data: {
+            labels: topItems.map(l => shortLbl(l, 32)),
+            datasets: months.map((m, i) => {
+              const mp = {}; (m.revenue_items || []).forEach(it => { mp[it.label] = Number(it.usd || 0); });
+              return {label: m.name, rate: m.rate, data: topItems.map(l => mp[l] || 0), backgroundColor: PALETTE[i % 8], borderRadius: 3};
+            })
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: {mode: 'index', intersect: false},
+            plugins: {legend: {display: false}, tooltip: tip},
+            scales: {x: {grid: {display: false}, ticks: {maxRotation: 50, minRotation: 30, autoSkip: false}}, y: {grace: many ? '25%' : '12%', title: usdAxisTitle, ticks: {callback: v => '$' + compact(v)}, grid: {color: '#e5e7eb'}}}
+          }
+        });
+        pnlCharts.push(itemsChart);
+        htmlLegend(itemsChart, document.getElementById('pnlItemsLegend' + si));
+      }
+    });
+  }
+
+  function fmt(n) { return n.toLocaleString(undefined, {maximumFractionDigits: 2}); }
+
+  function renderCompanyTable(data, rate) {
+    const selections = data.selections || [];
+    if (!selections.length) {
+      companyResults.innerHTML = '<p>No breakdown available.</p>';
+      return;
+    }
+
+    function num(v) { return (v === undefined || v === null) ? 0 : Number(v); }
+
+    function itemTable(selection, key, title, rate, subsectionField) {
+      const labels = [];
+      const seen = new Set();
+      selection.months.forEach(m => {
+        (m[key] || []).forEach(i => {
+          if (!seen.has(i.label)) { seen.add(i.label); labels.push(i.label); }
+        });
+      });
+      const maps = selection.months.map(m => { const mp = {}; (m[key] || []).forEach(i => { mp[i.label] = i; }); return mp; });
+      const totalMap = {}; (selection.total[key] || []).forEach(i => { totalMap[i.label] = i; });
+      const monthHeaders = selection.months.map(m => `<th class="num">${esc(m.name)} Rs</th>${rate ? `<th class="num">${esc(m.name)} USD</th>` : ''}`).join('');
+      const rows = labels.map(label => {
+        const first = selection.months.map(m => (m[key] || []).find(i => i.label === label)).find(Boolean);
+        const sub = subsectionField && first && first[subsectionField] ? `<span class="pnl-subsection">${esc(first[subsectionField])}</span>` : '';
+        const cells = selection.months.map((m, idx) => { const item = maps[idx][label]; return `<td class="num">Rs ${fmt(num(item && item.rs))}</td>` + (rate ? `<td class="num">$ ${fmt(num(item && item.usd))}</td>` : ''); }).join('');
+        const totalItem = totalMap[label];
+        return `<tr><td>${sub}${esc(label)}</td>${cells}<td class="num total-col">Rs ${fmt(num(totalItem && totalItem.rs))}</td>${rate ? `<td class="num total-col">$ ${fmt(num(totalItem && totalItem.usd))}</td>` : ''}</tr>`;
+      }).join('');
+      const totalRs = selection.total[title.totalKey] || 0;
+      const totalUsd = rate ? selection.total[title.usdKey] : null;
+      const colSpan = 1 + selection.months.length * (rate ? 2 : 1) + (rate ? 2 : 1);
+      return `<details class="breakdown-card">
+        <summary class="breakdown-summary"><div class="breakdown-title"><span class="breakdown-chevron">⌄</span><span><b>${esc(title.label)}</b><small>Click to view account-wise detail</small></span></div><div class="breakdown-total"><span>Rs ${fmt(num(totalRs))}</span>${rate ? `<b>$ ${fmt(num(totalUsd))}</b>` : ''}</div></summary>
+        <div class="breakdown-detail"><div class="table-scroll"><table><thead><tr><th>Item</th>${monthHeaders}<th class="num">All selected months Rs</th>${rate ? '<th class="num">All selected months USD</th>' : ''}</tr></thead><tbody>
+          ${rows || `<tr><td colspan="${colSpan}">No ${esc(title.label.toLowerCase())} items.</td></tr>`}
+          <tr class="total-row"><td>${esc(title.totalLabel)}</td>${selection.months.map(m => { const rs=m[title.totalKey]||0; const usd=rate?m[title.usdKey]:null; return `<td class="num">Rs ${fmt(num(rs))}</td>`+(rate?`<td class="num">$ ${fmt(num(usd))}</td>`:''); }).join('')}<td class="num total-col">Rs ${fmt(num(totalRs))}</td>${rate?`<td class="num total-col">$ ${fmt(num(totalUsd))}</td>`:''}</tr>
+        </tbody></table></div></div></details>`;
+    }
+
+    function cogsHierarchyTable(selection, rate) {
+      const rows = selection.total.cogs_rows || [];
+      const monthMaps = selection.months.map(m => { const mp = {}; (m.cogs_rows || []).forEach(r => { mp[r.key] = r; }); return mp; });
+      const monthHeaders = selection.months.map(m => `<th class="num">${esc(m.name)} Rs</th>${rate ? `<th class="num">${esc(m.name)} USD</th>` : ''}`).join('');
+      const colSpan = 1 + selection.months.length * (rate ? 2 : 1) + (rate ? 2 : 1);
+      const body = rows.map(r => {
+        const pad=6+(r.level||0)*18; const nameCell=`<td style="padding-left:${pad}px">${esc(r.label)}</td>`;
+        if(r.kind==='heading') return `<tr class="h-row">${nameCell}<td colspan="${colSpan-1}"></td></tr>`;
+        const cells=selection.months.map((m,idx)=>{const it=monthMaps[idx][r.key];return `<td class="num">Rs ${fmt(num(it&&it.rs))}</td>`+(rate?`<td class="num">$ ${fmt(num(it&&it.usd))}</td>`:'');}).join('');
+        const cls=r.kind==='total'?`h-total lvl${r.level||0}`:''; return `<tr class="${cls}">${nameCell}${cells}<td class="num total-col">Rs ${fmt(num(r.rs))}</td>${rate?`<td class="num total-col">$ ${fmt(num(r.usd))}</td>`:''}</tr>`;
+      }).join('');
+      const totalCells=selection.months.map(m=>`<td class="num">Rs ${fmt(num(m.total_cogs))}</td>`+(rate?`<td class="num">$ ${fmt(num(m.total_cogs_usd))}</td>`:'')).join('');
+      return `<details class="breakdown-card"><summary class="breakdown-summary"><div class="breakdown-title"><span class="breakdown-chevron">⌄</span><span><b>Cost of Goods Sold (COGS)</b><small>Click to view COGS account hierarchy</small></span></div><div class="breakdown-total"><span>Rs ${fmt(num(selection.total.total_cogs))}</span>${rate?`<b>$ ${fmt(num(selection.total.total_cogs_usd))}</b>`:''}</div></summary><div class="breakdown-detail"><div class="table-scroll"><table><thead><tr><th>Item</th>${monthHeaders}<th class="num">All selected months Rs</th>${rate?'<th class="num">All selected months USD</th>':''}</tr></thead><tbody>${body||`<tr><td colspan="${colSpan}">No COGS items.</td></tr>`}<tr class="total-row"><td>Total COGS</td>${totalCells}<td class="num total-col">Rs ${fmt(num(selection.total.total_cogs))}</td>${rate?`<td class="num total-col">$ ${fmt(num(selection.total.total_cogs_usd))}</td>`:''}</tr></tbody></table></div></div></details>`;
+    }
+
+    function resultRow(selection, label, key, usdKey, signClass='') {
+      return `
+        <tr class="${signClass}">
+          <td><b>${esc(label)}</b></td>
+          ${selection.months.map(m => {
+            const rs = num(m[key]);
+            const usd = rate ? num(m[usdKey]) : null;
+            return `<td class="num">Rs ${fmt(rs)}</td>` +
+              (rate ? `<td class="num">$ ${fmt(usd)}</td>` : '');
+          }).join('')}
+          <td class="num total-col"><b>Rs ${fmt(num(selection.total[key]))}</b></td>
+          ${rate ? `<td class="num total-col"><b>$ ${fmt(num(selection.total[usdKey]))}</b></td>` : ''}
+        </tr>`;
+    }
+
+    function summaryTable(selection) {
+      const headers = selection.months.map(m =>
+        `<th class="num">${esc(m.name)} Rs</th>${rate ? `<th class="num">${esc(m.name)} USD</th>` : ''}`
+      ).join('');
+
+      return `
+        <div class="cat-heading">P&amp;L Summary</div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Profit &amp; Loss</th>${headers}
+                <th class="num">All selected months Rs</th>
+                ${rate ? '<th class="num">All selected months USD</th>' : ''}
+              </tr>
+            </thead>
+            <tbody>
+              ${resultRow(selection, 'Total Revenue', 'total_revenue', 'total_revenue_usd')}
+              ${resultRow(selection, 'Less: Total COGS', 'total_cogs', 'total_cogs_usd')}
+              ${resultRow(selection, 'Gross Profit', 'gross_profit', 'gross_profit_usd', 'pnl-result-row')}
+              ${resultRow(selection, 'Less: Operating Expense', 'total_operating_expense', 'total_operating_expense_usd')}
+              ${resultRow(selection, 'Net Operational Income', 'net_operational_income', 'net_operational_income_usd', 'pnl-result-row')}
+              ${resultRow(selection, 'Add: Other Income', 'total_other_income', 'total_other_income_usd')}
+              ${resultRow(selection, 'Less: Other Expense', 'total_other_expense', 'total_other_expense_usd')}
+              ${resultRow(selection, 'Net Other Income / (Expense)', 'net_other_income', 'net_other_income_usd')}
+              ${resultRow(selection,
+                num(selection.total.net_income) >= 0 ? 'Net Profit' : 'Net Loss',
+                'net_income', 'net_income_usd',
+                num(selection.total.net_income) >= 0 ? 'net-row' : 'net-loss-row')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function compareSummary() {
+      const chips = selections.map((s, i) =>
+        `<a class="sel-chip" href="#sel-block-${i}">${i + 1}. ${esc(s.name)}</a>`).join('');
+      const cols = [
+        ['Total Revenue','total_revenue','total_revenue_usd'],
+        ['COGS','total_cogs','total_cogs_usd'],
+        ['Gross Profit','gross_profit','gross_profit_usd'],
+        ['Operating Expense','total_operating_expense','total_operating_expense_usd'],
+        ['Net Operational','net_operational_income','net_operational_income_usd'],
+        ['Net Profit / Loss','net_income','net_income_usd']
+      ];
+      const head = cols.map(c => `<th class="num">${c[0]}</th>`).join('');
+      const body = selections.map((s, i) => `<tr><td><b>${i + 1}. ${esc(s.name)}</b></td>` +
+        cols.map(c => `<td class="num">Rs ${fmt(num(s.total[c[1]]))}` +
+          (rate ? `<br><span class="usd-sub">$ ${fmt(num(s.total[c[2]]))}</span>` : '') + `</td>`).join('') + `</tr>`).join('');
+      return `<div class="compare-box">
+        <h3>${selections.length > 1 ? 'All ' + selections.length + ' selected companies — side by side' : 'Selected company'}</h3>
+        <div class="sel-chips">${chips}</div>
+        <div class="hint">Click a name to jump to its full P&amp;L below. Totals are across all selected months.</div>
+        <div class="table-scroll"><table><thead><tr><th>Company / Group</th>${head}</tr></thead><tbody>${body}</tbody></table></div>
+      </div>`;
+    }
+
+    companyResults.innerHTML = compareSummary() + selections.map((selection, idx) => `
+      <div class="selection-block" id="sel-block-${idx}">
+        <h3 class="selection-title">${idx + 1}. ${esc(selection.name)}</h3>
+
+        ${itemTable(selection, 'revenue_items',
+          {label:'Revenue — Ad / Revenue Sources', totalKey:'total_revenue',
+           usdKey:'total_revenue_usd', totalLabel:'Total Revenue'}, rate)}
+
+        ${cogsHierarchyTable(selection, rate)}
+
+        ${itemTable(selection, 'operating_expense_items',
+          {label:'Operating Expense', totalKey:'total_operating_expense',
+           usdKey:'total_operating_expense_usd', totalLabel:'Total Operating Expense'}, rate, 'subsection')}
+
+        ${itemTable(selection, 'other_income_items',
+          {label:'Other Income', totalKey:'total_other_income',
+           usdKey:'total_other_income_usd', totalLabel:'Total Other Income'}, rate)}
+
+        ${itemTable(selection, 'other_expense_items',
+          {label:'Other Expense', totalKey:'total_other_expense',
+           usdKey:'total_other_expense_usd', totalLabel:'Total Other Expense'}, rate, 'subsection')}
+
+        ${summaryTable(selection)}
+      </div>
+    `).join('');
+  }
+
+
+  function downloadBlob(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+
+  // SVG download is not needed anymore (Chart.js draws on a canvas) — PNG replaces it.
+  document.getElementById('downloadGraphSvgBtn').style.display = 'none';
+  document.getElementById('downloadGraphPngBtn').onclick = () => {
+    if (!chartInst) { graphStatus.textContent = 'Build a graph first.'; return; }
+    const a = document.createElement('a');
+    a.href = chartInst.toBase64Image('image/png', 1);
+    a.download = 'graph.png';
+    a.click();
+  };
+
+  document.getElementById('downloadGraphCsvBtn').onclick=()=>{ if(!lastGraphRows.length){ graphStatus.textContent='Build a graph first.'; return; } const c=lastGraphCurrency; const lines=[[lastVsKind?'Series':isSourceMode()?sourceKind():(document.getElementById('graphMetric').selectedOptions[0]?.text||'Metric'),'Month','Company / Group',c].join(',')]; lastGraphRows.forEach(r=>{const label=(r.ad||r.company||'').replaceAll('"','""'); lines.push([`"${label}"`,`"${r.month||''}"`,`"${r.company||''}"`,graphValue(r).toFixed(2)].join(','));}); downloadBlob(new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'}),'graph-data.csv'); };
+  document.getElementById('graphCurrency').onchange=()=>{ if(lastVsKind&&lastVsData){ renderVsGraph(lastVsData,document.getElementById('graphType').value,lastVsKind); return; } if(lastGraphRows.length) renderCustomGraph({rows:lastGraphRows,ad_rows:lastGraphRows},document.getElementById('graphType').value,isSourceMode()?'ads':document.getElementById('graphMetric').value,selectedAdNames()); };
+
+  // ---------------------------------------------------------------------
+  // Comparison in Amount  (difference between months: Rs, %, USD)
+  // ---------------------------------------------------------------------
+  const compareBtn = document.getElementById('compareBtn');
+  const comparePanel = document.getElementById('comparePanel');
+  const compareMonthsEl = document.getElementById('compareMonths');
+  const compareResult = document.getElementById('compareResult');
+  const compareStatus = document.getElementById('compareStatus');
+  const runCompareBtn = document.getElementById('runCompareBtn');
+  const downloadCompareBtn = document.getElementById('downloadCompareBtn');
+
+  function renderCompareMonths() {
+    const prev = new Set(Array.from(compareMonthsEl.querySelectorAll('.cmpMonthCb:checked')).map(x => x.dataset.id));
+    const hadList = compareMonthsEl.querySelector('.cmpMonthCb') !== null;
+    compareMonthsEl.innerHTML = uploadedFiles.length
+      ? uploadedFiles.map(f => `<label class="graph-check"><input type="checkbox" class="cmpMonthCb" data-id="${f.id}" ${(!hadList || prev.has(f.id)) ? 'checked' : ''}><span>${esc(f.name)}${f.rate > 0 ? '' : ' <i style="color:#d97706">(rate not set)</i>'}</span></label>`).join('')
+      : '<div class="hint">No sheets yet.</div>';
+  }
+  function compareSelectedMonths() {
+    const ids = new Set(Array.from(compareMonthsEl.querySelectorAll('.cmpMonthCb:checked')).map(x => x.dataset.id));
+    return uploadedFiles.filter(f => ids.has(f.id));      // calendar order = comparison order
+  }
+  function updateCompareCompanies(sel) {
+    sel = sel || currentSelection();
+    document.getElementById('compareCompCount').textContent = sel.length
+      ? sel.length + ' selected — ' + sel.map(s => s.name).join(', ')
+      : 'none ticked — tick one or more companies/groups in the list above';
+  }
+  compareBtn.onclick = () => {
+    const open = comparePanel.style.display !== 'block';
+    comparePanel.style.display = open ? 'block' : 'none';
+    if (open) { renderCompareMonths(); updateCompareCompanies(); comparePanel.scrollIntoView({behavior: 'smooth', block: 'start'}); }
+  };
+
+  function cmpNum(n) { return Number(n || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+  function cmpCell(n, prefix) {
+    const v = Number(n || 0);
+    const txt = (v < 0 ? '-' : '') + prefix + cmpNum(Math.abs(v));
+    return `<td class="num ${v < 0 ? 'neg' : ''}">${txt}</td>`;
+  }
+  function cmpPct(p) {
+    if (p === null || p === undefined) return '<td class="num">—</td>';
+    return `<td class="num ${p < 0 ? 'neg' : (p > 0 ? 'pos' : '')}">${(p > 0 ? '+' : '') + p.toFixed(2)}%</td>`;
+  }
+  function cmpTable(title, rows, months) {
+    if (!rows.length) return '';
+    const steps = rows[0].steps;
+    const head1 = '<th rowspan="2">Item</th>' + months.map(m => `<th class="num grp-month" colspan="2">${esc(m)}</th>`).join('')
+      + steps.map(st => `<th class="num ${st.overall ? 'grp-overall' : 'grp-diff'}" colspan="3">${st.overall ? '★ ' : ''}${esc(st.title)}</th>`).join('');
+    const head2 = months.map(() => '<th class="num grp-month">Rs</th><th class="num grp-month">USD</th>').join('')
+      + steps.map(st => { const c = st.overall ? 'grp-overall' : 'grp-diff'; return `<th class="num ${c}">Diff Rs</th><th class="num ${c}">%</th><th class="num ${c}">Diff USD</th>`; }).join('');
+    const body = rows.map(r => '<tr><td>' + esc(r.label) + '</td>'
+      + r.rs.map((v, i) => cmpCell(v, 'Rs ') + cmpCell(r.usd[i], '$')).join('')
+      + r.steps.map(st => cmpCell(st.diff_rs, 'Rs ') + cmpPct(st.pct) + cmpCell(st.diff_usd, '$')).join('')
+      + '</tr>').join('');
+    return `<h5>${esc(title)}</h5><div class="table-scroll"><table class="cmp-table"><thead><tr>${head1}</tr><tr>${head2}</tr></thead><tbody>${body}</tbody></table></div>`;
+  }
+
+  function compareFormData(months, sel) {
+    const fd = new FormData();
+    months.forEach(f => fd.append('files', f.file));
+    fd.append('rates', ratesOf(months));
+    return fd;
+  }
+
+  function compareChecks() {
+    const months = compareSelectedMonths();
+    const sel = currentSelection();
+    if (months.length < 2) { compareStatus.textContent = 'Tick at least 2 months to compare.'; return null; }
+    if (!sel.length) { compareStatus.textContent = 'Tick at least one company/group in the list above.'; return null; }
+    const miss = months.filter(f => !(f.rate > 0));
+    if (miss.length) { compareStatus.textContent = 'USD rate missing for: ' + miss.map(f => f.name).join(', ') + (CAN_UPLOAD ? ' — set it on the sheet row.' : ' — ask the administrator.'); return null; }
+    compareStatus.textContent = '';
+    return {months, sel};
+  }
+
+  runCompareBtn.onclick = async () => {
+    const ctx = compareChecks(); if (!ctx) return;
+    const {months, sel} = ctx;
+    const fd = compareFormData(months, sel);
+    fd.append('cols', sel.map(s => s.col).join(','));
+    fd.append('names', JSON.stringify(sel.map(s => s.name)));
+    compareStatus.textContent = 'Calculating…';
+    const res = await fetch('/compare_amount', {method: 'POST', body: fd});
+    if (authFail(res)) return;
+    if (!res.ok) { let m = 'Could not calculate the comparison.'; try { m = (await res.json()).detail || m; } catch (e) {} compareStatus.textContent = m; return; }
+    const data = await res.json();
+    compareStatus.textContent = months.length + ' months × ' + sel.length + ' compan' + (sel.length === 1 ? 'y' : 'ies') + ' — every pair of months compared.  Difference = later month − earlier month; % = difference ÷ |earlier month Rs|; USD uses each month\'s own rate.';
+    compareResult.innerHTML = data.selections.map((s, i) => `<div class="cmp-card"><h4>${i + 1}. ${esc(s.name)}</h4>`
+      + cmpTable('P&L summary', s.summary, data.months)
+      + cmpTable('Revenue by source', s.sources, data.months) + '</div>').join('');
+    downloadCompareBtn.style.display = 'inline-block';
+  };
+
+  downloadCompareBtn.onclick = async () => {
+    const ctx = compareChecks(); if (!ctx) return;
+    const {months, sel} = ctx;
+    const fd = compareFormData(months, sel);
+    const name = sel.map(s => s.name).join(' + ') + ' — Comparison';
+    fd.append('mode', 'multi');
+    fd.append('compare', '1');
+    fd.append('key', sel.map(s => s.col).join(','));
+    fd.append('name', name);
+    fd.append('months', months.map(f => f.name).join(','));
+    compareStatus.textContent = 'Building Excel…';
+    const res = await fetch('/export', {method: 'POST', body: fd});
+    if (authFail(res)) return;
+    if (!res.ok) { compareStatus.textContent = 'Comparison download failed.'; return; }
+    compareStatus.textContent = 'Excel downloaded.';
+    downloadBlob(await res.blob(), name.replace(/[^A-Za-z0-9 _-]/g, '_').slice(0, 120) + '_USD.xlsx');
+  };
+
+  if (CAN_VIEW) loadCompanies();
+</script>
+<script>
+(() => {
+  if (!document.body.classList.contains('admin')) return;
+  document.getElementById('userManagement').style.display = 'block';
+  const $ = id => document.getElementById(id);
+  const form = $('umCreate'), company = $('umCompany'), status = $('umStatus'), tbody = document.querySelector('#umTable tbody');
+  const overlay = $('umOverlay'), eRole = $('umEditRole'), eCompany = $('umEditCompany'), ePass = $('umEditPassword'), eActive = $('umEditActive');
+  const PERM_LABELS = {view: 'View', upload: 'Upload', download: 'Download', edit: 'Edit/Delete'};
+  let users = [], companyOptions = '', editing = null;
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  async function api(url, options = {}) {
+    const r = await fetch(url, options), d = await r.json().catch(() => ({}));
+    if (!r.ok) throw Error(d.detail || 'Request failed');
+    return d;
+  }
+  const permBoxes = box => [...box.querySelectorAll('input[data-perm]')];
+  // Guests have no company of their own, so Upload / Edit are not available for them.
+  function syncRole(roleSel, companySel, box) {
+    const guest = roleSel.value === 'guest';
+    companySel.disabled = guest;
+    permBoxes(box).forEach(cb => {
+      const locked = guest && (cb.dataset.perm === 'upload' || cb.dataset.perm === 'edit');
+      if (locked) cb.checked = false;
+      cb.disabled = locked;
+      cb.closest('label').classList.toggle('off', locked);
+    });
+  }
+  // "View" is the base permission: turning it off turns the rest off, turning anything else on turns it on.
+  function linkView(box) {
+    box.addEventListener('change', e => {
+      const cb = e.target.closest('input[data-perm]'); if (!cb) return;
+      const view = box.querySelector('[data-perm="view"]');
+      if (cb.dataset.perm === 'view' && !cb.checked) permBoxes(box).forEach(x => { if (x !== cb) x.checked = false; });
+      else if (cb.checked) view.checked = true;
+    });
+  }
+  const readPerms = (box, fd) => permBoxes(box).forEach(cb => fd.append('perm_' + cb.dataset.perm, String(cb.checked && !cb.disabled)));
+  linkView($('umCreatePerms')); linkView($('umEditPerms'));
+
+  const chips = p => Object.keys(PERM_LABELS).map(k => `<span class="um-chip ${p[k] ? 'on' : ''}">${PERM_LABELS[k]}</span>`).join('');
+  function render() {
+    tbody.innerHTML = users.map(x => `<tr style="border-top:1px solid #e5e7eb">
+      <td style="padding:9px;font-weight:700">${esc(x.username)}</td>
+      <td style="padding:9px;text-transform:capitalize">${esc(x.role)}</td>
+      <td style="padding:9px">${esc(x.company || 'All enabled companies')}</td>
+      <td style="padding:9px">${chips(x.permissions || {})}</td>
+      <td style="padding:9px"><span class="um-status ${x.active ? 'active' : 'off'}">${x.active ? 'Active' : 'Disabled'}</span></td>
+      <td style="padding:9px"><div class="um-actions">
+        <button type="button" class="btn-primary" data-edit="${esc(x.username)}">Edit access</button>
+        <button type="button" class="btn-warning" data-toggle="${esc(x.username)}">${x.active ? 'Disable' : 'Enable'}</button>
+        <button type="button" class="btn-danger" data-revoke="${esc(x.username)}">Delete</button>
+      </div></td></tr>`).join('') || '<tr><td colspan="6" style="padding:12px">No managed users yet.</td></tr>';
+  }
+  async function load() {
+    try {
+      const [u, c] = await Promise.all([api('/api/admin/users'), api('/api/admin/companies')]);
+      users = u.users;
+      companyOptions = c.companies.filter(x => x.enabled).map(x => `<option value="${esc(x.name)}">${esc(x.name)}</option>`).join('');
+      company.innerHTML = companyOptions;
+      render(); status.textContent = 'Users loaded.';
+    } catch (e) { status.textContent = e.message; }
+  }
+
+  form.addEventListener('change', e => { if (e.target.name === 'role') syncRole(form.role, company, $('umCreatePerms')); });
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+      const fd = new FormData(form);
+      if (form.role.value === 'guest') fd.set('company', '');
+      readPerms($('umCreatePerms'), fd);
+      await api('/api/admin/users', {method: 'POST', body: fd});
+      form.reset();
+      permBoxes($('umCreatePerms')).forEach(cb => { cb.checked = cb.dataset.perm !== 'edit'; });
+      syncRole(form.role, company, $('umCreatePerms'));
+      status.textContent = 'Login created.'; await load();
+    } catch (err) { status.textContent = err.message; }
+  });
+
+  function closeEdit() { overlay.classList.remove('open'); editing = null; }
+  function openEdit(u) {
+    editing = u;
+    $('umEditTitle').textContent = 'Edit access — ' + u.username;
+    eRole.value = u.role; eCompany.innerHTML = companyOptions;
+    if (u.company && ![...eCompany.options].some(o => o.value === u.company)) eCompany.insertAdjacentHTML('afterbegin', `<option value="${esc(u.company)}">${esc(u.company)}</option>`);
+    eCompany.value = u.company || ''; ePass.value = ''; eActive.checked = u.active;
+    permBoxes($('umEditPerms')).forEach(cb => { cb.checked = !!(u.permissions || {})[cb.dataset.perm]; });
+    syncRole(eRole, eCompany, $('umEditPerms'));
+    overlay.classList.add('open');
+  }
+  eRole.addEventListener('change', () => syncRole(eRole, eCompany, $('umEditPerms')));
+  $('umEditCancel').addEventListener('click', closeEdit);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeEdit(); });
+  async function saveUser(u, over = {}) {
+    const fd = new FormData();
+    fd.append('role', over.role ?? u.role);
+    fd.append('company', over.company ?? (u.role === 'guest' ? '' : u.company));
+    fd.append('password', over.password ?? '');
+    fd.append('active', String(over.active ?? u.active));
+    Object.keys(PERM_LABELS).forEach(k => fd.append('perm_' + k, String(over.perms ? over.perms[k] : (u.permissions || {})[k])));
+    await api('/api/admin/users/' + encodeURIComponent(u.username), {method: 'PUT', body: fd});
+  }
+  $('umEditSave').addEventListener('click', async () => {
+    if (!editing) return;
+    try {
+      const perms = {}; permBoxes($('umEditPerms')).forEach(cb => { perms[cb.dataset.perm] = cb.checked && !cb.disabled; });
+      await saveUser(editing, {role: eRole.value, company: eRole.value === 'guest' ? '' : eCompany.value,
+                               password: ePass.value, active: eActive.checked, perms});
+      const name = editing.username; closeEdit();
+      status.textContent = 'Access updated for ' + name + '.'; await load();
+    } catch (err) { alert(err.message); }
+  });
+
+  tbody.addEventListener('click', async e => {
+    const edit = e.target.closest('[data-edit]'), tog = e.target.closest('[data-toggle]'), del = e.target.closest('[data-revoke]');
+    try {
+      if (edit) openEdit(users.find(x => x.username === edit.dataset.edit));
+      if (tog) { const u = users.find(x => x.username === tog.dataset.toggle); await saveUser(u, {active: !u.active}); status.textContent = u.username + (u.active ? ' disabled.' : ' enabled.'); await load(); }
+      if (del) { const name = del.dataset.revoke; if (!confirm(`Delete login for ${name}? This cannot be undone.`)) return;
+        await api('/api/admin/users/' + encodeURIComponent(name), {method: 'DELETE'}); status.textContent = 'Login deleted.'; await load(); }
+    } catch (err) { status.textContent = err.message; }
+  });
+  $('umRefresh').addEventListener('click', load);
+  syncRole(form.role, company, $('umCreatePerms')); load();
+})();
+</script>
+
+</body></html>
